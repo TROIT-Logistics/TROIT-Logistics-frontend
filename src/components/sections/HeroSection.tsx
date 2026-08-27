@@ -32,11 +32,11 @@ export const HeroSection: React.FC = () => {
       <style>{`
         .hero-section {
           position: relative;
-          min-height: 88vh;
+          min-height: 100vh;
           display: flex;
           align-items: center;
-          padding-top: 100px;
-          padding-bottom: 60px;
+          padding-top: 120px;
+          padding-bottom: 80px;
           overflow: hidden;
         }
 
@@ -50,7 +50,7 @@ export const HeroSection: React.FC = () => {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center top;
+          object-position: center 25%;
         }
 
         .hero-overlay {
@@ -58,9 +58,15 @@ export const HeroSection: React.FC = () => {
           inset: 0;
           background: linear-gradient(
             to right,
-            rgba(0, 0, 0, 0.45) 0%,
-            rgba(0, 0, 0, 0.25) 50%,
-            rgba(0, 0, 0, 0.1) 100%
+            rgba(0, 0, 0, 0.5) 0%,
+            rgba(0, 0, 0, 0.3) 50%,
+            rgba(0, 0, 0, 0.15) 100%
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.2) 0%,
+            transparent 40%,
+            rgba(0, 0, 0, 0.25) 100%
           );
         }
 
@@ -69,18 +75,19 @@ export const HeroSection: React.FC = () => {
           z-index: 10;
           display: flex;
           align-items: center;
+          width: 100%;
         }
 
         .hero-card {
           max-width: 480px;
-          background: rgba(10, 15, 25, 0.72);
+          background: rgba(10, 15, 25, 0.76);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.12);
+          border: 1px solid rgba(255, 255, 255, 0.14);
           border-radius: 20px;
           padding: 2.5rem;
           color: #FFFFFF;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
         }
 
         .hero-title {
@@ -95,7 +102,7 @@ export const HeroSection: React.FC = () => {
         .hero-subtitle {
           font-size: 1rem;
           line-height: 1.6;
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(255, 255, 255, 0.88);
           margin-bottom: 2rem;
         }
 
@@ -112,7 +119,20 @@ export const HeroSection: React.FC = () => {
           font-weight: 600;
         }
 
+        @media (min-width: 1024px) {
+          .hero-section {
+            min-height: 100vh;
+            padding-top: 140px;
+            padding-bottom: 100px;
+          }
+        }
+
         @media (max-width: 640px) {
+          .hero-section {
+            min-height: 90vh;
+            padding-top: 100px;
+            padding-bottom: 60px;
+          }
           .hero-card {
             padding: 1.75rem;
           }

@@ -71,8 +71,13 @@ export const Navbar: React.FC = () => {
           font-size: 1.75rem;
           font-weight: 900;
           letter-spacing: -0.04em;
-          color: var(--nav-logo);
-          transition: color 0.3s ease;
+          color: #FFFFFF;
+          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+          transition: transform 0.2s ease;
+        }
+
+        .navbar-logo:hover {
+          transform: scale(1.02);
         }
 
         .navbar-menu {
@@ -84,7 +89,7 @@ export const Navbar: React.FC = () => {
           padding: 8px 28px;
           border-radius: 9999px;
           border: 1px solid var(--nav-menu-border);
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
           transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
@@ -119,7 +124,7 @@ export const Navbar: React.FC = () => {
           border-radius: 50%;
           background-color: var(--nav-menu-bg);
           border: 1px solid var(--nav-menu-border);
-          color: var(--nav-logo);
+          color: var(--nav-text);
           backdrop-filter: blur(12px);
           transition: all 0.2s ease;
         }
