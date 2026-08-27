@@ -45,7 +45,7 @@ export const LastMileServicesSection: React.FC = () => {
           <div className="service-content">
             <h3 className="service-heading">Express delivery</h3>
             <ul className="service-list">
-              <li>Delivery in 24-48 hours with real-time tracking for peace of mind.</li>
+              <li>Products are delivered with real-time tracking for greater assurance.</li>
               <li>Available for both local and global shipments.</li>
               <li>Packages are given top priority delivery stage entrance.</li>
             </ul>
