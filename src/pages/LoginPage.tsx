@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { loginUser } from '@/lib/api/auth';
-import { seedDemoData } from '@/lib/api/seed';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Sparkles, ArrowRight, Lock, Mail } from 'lucide-react';
+import { ArrowRight, Lock, Mail } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -15,7 +14,6 @@ export const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [seedMsg, setSeedMsg] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,56 +34,6 @@ export const LoginPage: React.FC = () => {
       }
     } catch (err) {
       setError((err as Error).message || 'Login failed. Please verify credentials.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleQuickLogin = async (targetEmail: string, pass: string) => {
-    setEmail(targetEmail);
-    setPassword(pass);
-    setError(null);
-    setIsLoading(true);
-
-    try {
-      const res = await loginUser({ email: targetEmail, password: pass });
-      if (res.token && res.user) {
-        login(res.token, res.user);
-        if (res.user.role === 'seller') {
-          navigate('/seller');
-        } else {
-          navigate('/buyer');
-        }
-      }
-    } catch {
-      // If demo user does not exist, trigger auto-seed then retry login
-      try {
-        await seedDemoData();
-        const retryRes = await loginUser({ email: targetEmail, password: pass });
-        if (retryRes.token && retryRes.user) {
-          login(retryRes.token, retryRes.user);
-          if (retryRes.user.role === 'seller') {
-            navigate('/seller');
-          } else {
-            navigate('/buyer');
-          }
-        }
-      } catch (seedErr) {
-        setError((seedErr as Error).message || 'Failed to auto-seed demo account');
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSeed = async () => {
-    setSeedMsg(null);
-    setIsLoading(true);
-    try {
-      const res = await seedDemoData();
-      setSeedMsg(res.message || 'Demo data seeded successfully!');
-    } catch (err) {
-      setError((err as Error).message || 'Failed to seed demo data');
     } finally {
       setIsLoading(false);
     }
@@ -130,52 +78,6 @@ export const LoginPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Quick Demo Helper Section */}
-          <div
-            style={{
-              backgroundColor: 'var(--color-surface-card)',
-              border: '1px solid var(--color-border-light)',
-              borderRadius: 'var(--radius-md)',
-              padding: '14px 16px',
-              marginBottom: '20px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-orange-primary)', marginBottom: '8px' }}>
-              <Sparkles size={14} /> DEMO QUICK-ACCESS
-            </div>
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-              <button
-                type="button"
-                className="btn btn-dark"
-                style={{ flex: 1, fontSize: '0.75rem', padding: '8px' }}
-                onClick={() => handleQuickLogin('buyer@demo.troit', 'DemoPass123!')}
-              >
-                Demo Buyer
-              </button>
-              <button
-                type="button"
-                className="btn btn-dark"
-                style={{ flex: 1, fontSize: '0.75rem', padding: '8px' }}
-                onClick={() => handleQuickLogin('seller@demo.troit', 'DemoPass123!')}
-              >
-                Demo Seller
-              </button>
-            </div>
-            <button
-              type="button"
-              style={{
-                width: '100%',
-                fontSize: '0.75rem',
-                color: 'var(--color-text-muted)',
-                textDecoration: 'underline',
-                textAlign: 'center',
-              }}
-              onClick={handleSeed}
-            >
-              Seed Demo Products & Accounts
-            </button>
-          </div>
-
           {error && (
             <div
               style={{
@@ -189,22 +91,6 @@ export const LoginPage: React.FC = () => {
               }}
             >
               {error}
-            </div>
-          )}
-
-          {seedMsg && (
-            <div
-              style={{
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                border: '1px solid #10B981',
-                color: '#10B981',
-                borderRadius: '8px',
-                padding: '10px 14px',
-                fontSize: '0.85rem',
-                marginBottom: '16px',
-              }}
-            >
-              {seedMsg}
             </div>
           )}
 
