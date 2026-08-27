@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import heroBg from '@/assets/images/hero_warehouse.png';
 
@@ -19,12 +20,12 @@ export const HeroSection: React.FC = () => {
             Fast, reliable, and trackable delivery, tailored to all of your search locations.
           </p>
           <div className="hero-actions">
-            <button className="btn btn-orange hero-btn">
+            <Link to="/register" className="btn btn-orange hero-btn">
               Get started <ArrowUpRight size={18} />
-            </button>
-            <button className="btn btn-yellow hero-btn">
+            </Link>
+            <a href="#contact" className="btn btn-yellow hero-btn">
               Get quote <ArrowUpRight size={18} />
-            </button>
+            </a>
           </div>
         </div>
       </div>
