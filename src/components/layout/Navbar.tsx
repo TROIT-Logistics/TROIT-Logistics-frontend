@@ -1,6 +1,6 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Sun, Moon, LogOut, User as UserIcon, ShoppingBag, Store } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Sun, Moon, LogOut, User as UserIcon, ShoppingBag, Store, Menu, X } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 
@@ -8,36 +8,69 @@ export const Navbar: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  const handleNavClick = (anchorId: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMobileMenuOpen(false);
+
+    if (location.pathname === '/') {
+      const element = document.getElementById(anchorId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      navigate(`/#${anchorId}`);
+      setTimeout(() => {
+        const element = document.getElementById(anchorId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  };
+
   return (
     <header className="navbar-container">
       <div className="container navbar-inner">
         {/* Brand Logo */}
-        <Link to="/" className="navbar-logo">
+        <Link to="/" className="navbar-logo" aria-label="TROIT Logistics Home">
           TROIT
         </Link>
 
-        {/* Central Navigation */}
-        <nav className="navbar-menu">
-          <Link to="/" className="nav-item">
-            Home
-          </Link>
+        {/* Desktop Central Navigation */}
+        <nav className="navbar-menu" aria-label="Primary Navigation">
+          <a href="#services" onClick={handleNavClick('services')} className="nav-item">
+            Services
+          </a>
+          <a href="#project" onClick={handleNavClick('project')} className="nav-item">
+            Project
+          </a>
+          <a href="#about" onClick={handleNavClick('about')} className="nav-item">
+            About
+          </a>
+          <a href="#contact" onClick={handleNavClick('contact')} className="nav-item">
+            Contact
+          </a>
 
-          <Link to="/buyer" className="nav-item">
-            <ShoppingBag size={15} /> Marketplace
-          </Link>
+          <span style={{ color: 'var(--nav-menu-border)', fontSize: '0.9rem' }}>|</span>
 
-          <Link to="/seller" className="nav-item">
-            <Store size={15} /> Seller Hub
+          <Link to="/buyer" className="nav-item" style={{ fontSize: '0.8rem' }}>
+            <ShoppingBag size={14} /> Marketplace
+          </Link>
+          <Link to="/seller" className="nav-item" style={{ fontSize: '0.8rem' }}>
+            <Store size={14} /> Seller Hub
           </Link>
         </nav>
 
-        {/* Actions (Theme Toggle + Auth state) */}
+        {/* Actions (Theme Toggle + Auth state + Mobile Toggle) */}
         <div className="navbar-actions">
           <button
             className="theme-toggle-btn"
@@ -49,7 +82,7 @@ export const Navbar: React.FC = () => {
           </button>
 
           {isAuthenticated && user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div
                 style={{
                   display: 'flex',
@@ -80,7 +113,7 @@ export const Navbar: React.FC = () => {
               </button>
             </div>
           ) : (
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div className="auth-buttons-desktop" style={{ display: 'flex', gap: '8px' }}>
               <Link to="/login" className="btn btn-dark" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
                 Sign In
               </Link>
@@ -89,8 +122,66 @@ export const Navbar: React.FC = () => {
               </Link>
             </div>
           )}
+
+          {/* Mobile Hamburger Toggle */}
+          <button
+            className="mobile-menu-toggle"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Slide-Down Dropdown Menu */}
+      {mobileMenuOpen && (
+        <div className="mobile-nav-dropdown">
+          <a href="#services" onClick={handleNavClick('services')} className="mobile-nav-item">
+            Services
+          </a>
+          <a href="#project" onClick={handleNavClick('project')} className="mobile-nav-item">
+            Project
+          </a>
+          <a href="#about" onClick={handleNavClick('about')} className="mobile-nav-item">
+            About
+          </a>
+          <a href="#contact" onClick={handleNavClick('contact')} className="mobile-nav-item">
+            Contact
+          </a>
+
+          <div style={{ height: '1px', backgroundColor: 'var(--nav-menu-border)', margin: '8px 0' }} />
+
+          <Link to="/buyer" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-item">
+            <ShoppingBag size={16} /> Buyer Marketplace
+          </Link>
+          <Link to="/seller" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-item">
+            <Store size={16} /> Seller Hub
+          </Link>
+
+          {!isAuthenticated && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="btn btn-dark"
+                style={{ justifyContent: 'center', width: '100%' }}
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setMobileMenuOpen(false)}
+                className="btn btn-orange"
+                style={{ justifyContent: 'center', width: '100%' }}
+              >
+                Get Started
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
 
       <style>{`
         .navbar-container {
@@ -99,9 +190,9 @@ export const Navbar: React.FC = () => {
           left: 0;
           right: 0;
           z-index: 100;
-          padding: 1rem 0;
+          padding: 0.85rem 0;
           background-color: var(--nav-menu-bg);
-          backdrop-filter: blur(12px);
+          backdrop-filter: blur(14px);
           border-bottom: 1px solid var(--nav-menu-border);
         }
 
@@ -126,7 +217,7 @@ export const Navbar: React.FC = () => {
         .navbar-menu {
           display: flex;
           align-items: center;
-          gap: 1.75rem;
+          gap: 1.5rem;
           background-color: var(--color-surface-card);
           padding: 8px 24px;
           border-radius: 9999px;
@@ -141,6 +232,7 @@ export const Navbar: React.FC = () => {
           align-items: center;
           gap: 6px;
           transition: color 0.2s ease;
+          cursor: pointer;
         }
 
         .nav-item:hover {
@@ -177,9 +269,43 @@ export const Navbar: React.FC = () => {
           border-radius: 9999px;
         }
 
-        @media (max-width: 768px) {
+        .mobile-menu-toggle {
+          display: none;
+          background: none;
+          border: none;
+          color: var(--nav-text);
+          cursor: pointer;
+          padding: 4px;
+        }
+
+        .mobile-nav-dropdown {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          padding: 16px 20px;
+          background-color: var(--color-surface);
+          border-bottom: 1px solid var(--nav-menu-border);
+          margin-top: 12px;
+        }
+
+        .mobile-nav-item {
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: var(--nav-text);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        @media (max-width: 868px) {
           .navbar-menu {
             display: none;
+          }
+          .auth-buttons-desktop {
+            display: none !important;
+          }
+          .mobile-menu-toggle {
+            display: block;
           }
         }
       `}</style>
