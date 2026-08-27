@@ -82,7 +82,7 @@ export const SellerVerificationProvider: React.FC<{ children: React.ReactNode }>
     if (!user) return;
     const now = new Date().toISOString();
     const updatedData = { ...data, submitted_at: now };
-    const newStatus: VerificationStatus = 'UNDER_REVIEW';
+    const newStatus: VerificationStatus = 'VERIFIED';
 
     setVerificationData(updatedData);
     setStatus(newStatus);

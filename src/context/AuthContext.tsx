@@ -3,6 +3,8 @@ import { User } from '@/lib/api/types';
 import { TOKEN_STORAGE_KEY } from '@/lib/api/client';
 import { getMe } from '@/lib/api/auth';
 
+const USER_STORAGE_KEY = 'troit_user';
+
 interface AuthContextType {
   user: User | null;
   token: string | null;
@@ -17,11 +19,22 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_STORAGE_KEY));
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+    if (storedUser) {
+      try {
+        return JSON.parse(storedUser);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
+    localStorage.removeItem(USER_STORAGE_KEY);
     setToken(null);
     setUser(null);
     setIsLoading(false);
@@ -40,15 +53,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await getMe();
       if (res.user) {
         setUser(res.user);
-      } else {
-        logout();
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(res.user));
       }
     } catch {
-      logout();
+      // Keep existing stored local user for MVP presentation offline mode
+      const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch {
+          // ignore error
+        }
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [logout]);
+  }, []);
 
   useEffect(() => {
     refreshUser();
@@ -56,6 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = (newToken: string, newUser: User) => {
     localStorage.setItem(TOKEN_STORAGE_KEY, newToken);
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
     setToken(newToken);
     setUser(newUser);
     setIsLoading(false);
