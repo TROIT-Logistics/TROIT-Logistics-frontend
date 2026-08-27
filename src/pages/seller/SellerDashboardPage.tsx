@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { fetchProducts, verifyProduct } from '@/lib/api/products';
 import { fetchOrders } from '@/lib/api/orders';
 import { Product, Order } from '@/lib/api/types';
+import { getProductImage } from '@/lib/utils/productImages';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Plus, ShieldCheck, Clock, Sparkles } from 'lucide-react';
+import { Plus, Sparkles } from 'lucide-react';
 
 export const SellerDashboardPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -123,55 +124,62 @@ export const SellerDashboardPage: React.FC = () => {
                 </div>
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
-                  {products.map((prod) => (
-                    <div
-                      key={prod.id}
-                      style={{
-                        backgroundColor: 'var(--color-surface-card)',
-                        border: '1px solid var(--color-border-light)',
-                        borderRadius: 'var(--radius-md)',
-                        padding: '20px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  {products.map((prod) => {
+                    const prodImg = getProductImage(prod.name);
+
+                    return (
+                      <div
+                        key={prod.id}
+                        style={{
+                          backgroundColor: 'var(--color-surface-card)',
+                          border: '1px solid var(--color-border-light)',
+                          borderRadius: 'var(--radius-md)',
+                          overflow: 'hidden',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <div style={{ height: '160px', overflow: 'hidden', position: 'relative' }}>
+                          <img src={prodImg} alt={prod.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           <span
                             style={{
-                              fontSize: '0.75rem',
+                              position: 'absolute',
+                              top: '8px',
+                              right: '8px',
+                              fontSize: '0.7rem',
                               fontWeight: 700,
-                              padding: '2px 8px',
+                              padding: '3px 8px',
                               borderRadius: 'var(--radius-pill)',
-                              backgroundColor: prod.verification_status === 'VERIFIED' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 184, 66, 0.15)',
-                              color: prod.verification_status === 'VERIFIED' ? '#10B981' : '#D97706',
+                              backgroundColor: prod.verification_status === 'VERIFIED' ? 'rgba(16, 185, 129, 0.95)' : 'rgba(245, 184, 66, 0.95)',
+                              color: '#FFFFFF',
                             }}
                           >
-                            {prod.verification_status === 'VERIFIED' ? <ShieldCheck size={12} style={{ display: 'inline' }} /> : <Clock size={12} style={{ display: 'inline' }} />}{' '}
                             {prod.verification_status}
                           </span>
-
-                          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Stock: {prod.stock}</span>
                         </div>
 
-                        <h4 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '6px' }}>{prod.name}</h4>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-orange-primary)', marginBottom: '12px' }}>
-                          ₦{prod.price.toLocaleString()}
+                        <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                          <div>
+                            <h4 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '6px' }}>{prod.name}</h4>
+                            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-orange-primary)', marginBottom: '12px' }}>
+                              ₦{prod.price.toLocaleString()}
+                            </div>
+                          </div>
+
+                          {prod.verification_status === 'PENDING' && (
+                            <button
+                              onClick={() => handleDemoVerify(prod.id)}
+                              className="btn btn-dark"
+                              style={{ width: '100%', fontSize: '0.75rem', padding: '8px' }}
+                            >
+                              <Sparkles size={14} /> Demo Action: Mark Verified
+                            </button>
+                          )}
                         </div>
                       </div>
-
-                      {prod.verification_status === 'PENDING' && (
-                        <button
-                          onClick={() => handleDemoVerify(prod.id)}
-                          className="btn btn-dark"
-                          style={{ width: '100%', fontSize: '0.75rem', padding: '8px' }}
-                        >
-                          <Sparkles size={14} /> Demo Action: Mark Verified
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

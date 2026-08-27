@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { fetchProducts } from '@/lib/api/products';
 import { seedDemoData } from '@/lib/api/seed';
 import { Product } from '@/lib/api/types';
+import { getProductImage } from '@/lib/utils/productImages';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { ShieldCheck, Search, Sparkles, ShoppingBag, ArrowRight } from 'lucide-react';
@@ -161,79 +162,125 @@ export const BuyerPage: React.FC = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-              gap: '24px',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+              gap: '28px',
             }}
           >
-            {filteredProducts.map((product) => (
-              <div
-                key={product.id}
-                style={{
-                  backgroundColor: 'var(--color-surface)',
-                  border: '1px solid var(--color-border-light)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                  boxShadow: 'var(--shadow-sm)',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                    <span
+            {filteredProducts.map((product) => {
+              const prodImg = getProductImage(product.name);
+
+              return (
+                <div
+                  key={product.id}
+                  style={{
+                    backgroundColor: 'var(--color-surface)',
+                    border: '1px solid var(--color-border-light)',
+                    borderRadius: 'var(--radius-lg)',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+                    boxShadow: 'var(--shadow-sm)',
+                  }}
+                >
+                  {/* Product Image Container */}
+                  <div
+                    style={{
+                      height: '240px',
+                      backgroundColor: 'var(--color-surface-card)',
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden',
+                      borderBottom: '1px solid var(--color-border-light)',
+                    }}
+                  >
+                    <img
+                      src={prodImg}
+                      alt={product.name}
                       style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        transition: 'transform 0.3s ease',
+                      }}
+                    />
+
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '12px',
+                        left: '12px',
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '4px',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        color: '#10B981',
-                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.95)',
+                        color: '#FFFFFF',
                         borderRadius: 'var(--radius-pill)',
-                        padding: '4px 10px',
+                        padding: '4px 12px',
                         fontSize: '0.75rem',
                         fontWeight: 700,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                       }}
                     >
                       <ShieldCheck size={14} /> VERIFIED
-                    </span>
+                    </div>
 
-                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '12px',
+                        right: '12px',
+                        backgroundColor: 'rgba(0,0,0,0.6)',
+                        color: '#FFFFFF',
+                        backdropFilter: 'blur(8px)',
+                        borderRadius: 'var(--radius-pill)',
+                        padding: '4px 10px',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                      }}
+                    >
                       Stock: {product.stock}
-                    </span>
+                    </div>
                   </div>
 
-                  <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '8px', color: 'var(--color-text-main)' }}>
-                    {product.name}
-                  </h3>
+                  {/* Card Content */}
+                  <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
+                    <div>
+                      <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '8px', color: 'var(--color-text-main)' }}>
+                        {product.name}
+                      </h3>
 
-                  <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '16px', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {product.description}
-                  </p>
+                      <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '16px', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {product.description}
+                      </p>
 
-                  <div style={{ display: 'flex', gap: '6px', marginBottom: '16px' }}>
-                    <span style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-surface-card)', border: '1px solid var(--color-border-light)', padding: '4px 10px', borderRadius: '6px', color: 'var(--color-text-muted)', fontWeight: 600 }}>
-                      {product.condition}
-                    </span>
+                      <div style={{ display: 'flex', gap: '6px', marginBottom: '20px' }}>
+                        <span style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-surface-card)', border: '1px solid var(--color-border-light)', padding: '4px 10px', borderRadius: '6px', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                          {product.condition}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--color-orange-primary)', marginBottom: '16px' }}>
+                        ₦{product.price.toLocaleString()}
+                      </div>
+
+                      <Link
+                        to={`/buyer/products/${product.id}`}
+                        className="btn btn-orange"
+                        style={{ width: '100%', borderRadius: '8px', fontSize: '0.9rem', justifyContent: 'center' }}
+                      >
+                        View Details & Order <ArrowRight size={16} />
+                      </Link>
+                    </div>
                   </div>
                 </div>
-
-                <div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-orange-primary)', marginBottom: '16px' }}>
-                    ₦{product.price.toLocaleString()}
-                  </div>
-
-                  <Link
-                    to={`/buyer/products/${product.id}`}
-                    className="btn btn-orange"
-                    style={{ width: '100%', borderRadius: '8px', fontSize: '0.9rem', justifyContent: 'center' }}
-                  >
-                    View Details & Order <ArrowRight size={16} />
-                  </Link>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </main>
