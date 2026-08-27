@@ -1,64 +1,108 @@
 import React from 'react';
-import { ArrowUpRight, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Sun, Moon, LogOut, User as UserIcon, ShoppingBag, Store } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
+import { useAuth } from '@/context/AuthContext';
 
 export const Navbar: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <header className="navbar-container">
       <div className="container navbar-inner">
         {/* Brand Logo */}
-        <a href="/" className="navbar-logo">
+        <Link to="/" className="navbar-logo">
           TROIT
-        </a>
+        </Link>
 
-        {/* Central Pill Navigation */}
+        {/* Central Navigation */}
         <nav className="navbar-menu">
-          <a href="#home" className="nav-item active">
+          <Link to="/" className="nav-item">
             Home
-          </a>
-          <div className="nav-item dropdown">
-            <span>Services</span>
-            <ChevronDown size={14} />
-          </div>
-          <div className="nav-item dropdown">
-            <span>Project</span>
-            <ChevronDown size={14} />
-          </div>
-          <a href="#about" className="nav-item">
-            About
-          </a>
-          <a href="#contact" className="nav-item">
-            Contact
-          </a>
+          </Link>
+
+          <Link to="/buyer" className="nav-item">
+            <ShoppingBag size={15} /> Marketplace
+          </Link>
+
+          <Link to="/seller" className="nav-item">
+            <Store size={15} /> Seller Hub
+          </Link>
         </nav>
 
-        {/* Actions (Theme Toggle + CTA) */}
+        {/* Actions (Theme Toggle + Auth state) */}
         <div className="navbar-actions">
-          <button 
-            className="theme-toggle-btn" 
-            onClick={toggleTheme} 
+          <button
+            className="theme-toggle-btn"
+            onClick={toggleTheme}
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
             aria-label="Toggle theme"
           >
-            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
           </button>
 
-          <button className="btn btn-orange navbar-cta">
-            Get a quote <ArrowUpRight size={18} />
-          </button>
+          {isAuthenticated && user ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  backgroundColor: 'var(--nav-menu-bg)',
+                  border: '1px solid var(--nav-menu-border)',
+                  padding: '6px 14px',
+                  borderRadius: '9999px',
+                  fontSize: '0.825rem',
+                  fontWeight: 600,
+                  color: 'var(--nav-text)',
+                  backdropFilter: 'blur(12px)',
+                }}
+              >
+                <UserIcon size={14} style={{ color: 'var(--color-orange-primary)' }} />
+                <span>{user.full_name.split(' ')[0]}</span>
+                <span style={{ fontSize: '0.7rem', opacity: 0.7, textTransform: 'capitalize' }}>({user.role})</span>
+              </div>
+
+              <button
+                onClick={handleLogout}
+                className="theme-toggle-btn"
+                title="Logout"
+                aria-label="Logout"
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <Link to="/login" className="btn btn-dark" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
+                Sign In
+              </Link>
+              <Link to="/register" className="btn btn-orange navbar-cta">
+                Get Started
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
       <style>{`
         .navbar-container {
-          position: absolute;
+          position: fixed;
           top: 0;
           left: 0;
           right: 0;
-          z-index: 50;
-          padding: 1.25rem 0;
+          z-index: 100;
+          padding: 1rem 0;
+          background-color: var(--nav-menu-bg);
+          backdrop-filter: blur(12px);
+          border-bottom: 1px solid var(--nav-menu-border);
         }
 
         .navbar-inner {
@@ -71,8 +115,7 @@ export const Navbar: React.FC = () => {
           font-size: 1.75rem;
           font-weight: 900;
           letter-spacing: -0.04em;
-          color: #FFFFFF;
-          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+          color: var(--nav-logo);
           transition: transform 0.2s ease;
         }
 
@@ -83,30 +126,25 @@ export const Navbar: React.FC = () => {
         .navbar-menu {
           display: flex;
           align-items: center;
-          gap: 2rem;
-          background-color: var(--nav-menu-bg);
-          backdrop-filter: blur(12px);
-          padding: 8px 28px;
+          gap: 1.75rem;
+          background-color: var(--color-surface-card);
+          padding: 8px 24px;
           border-radius: 9999px;
           border: 1px solid var(--nav-menu-border);
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-          transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
         .nav-item {
-          font-size: 0.9rem;
-          font-weight: 500;
+          font-size: 0.875rem;
+          font-weight: 600;
           color: var(--nav-text);
           display: flex;
           align-items: center;
-          gap: 4px;
+          gap: 6px;
           transition: color 0.2s ease;
-          cursor: pointer;
         }
 
-        .nav-item:hover, .nav-item.active {
+        .nav-item:hover {
           color: var(--color-orange-primary);
-          font-weight: 600;
         }
 
         .navbar-actions {
@@ -119,13 +157,12 @@ export const Navbar: React.FC = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 40px;
-          height: 40px;
+          width: 38px;
+          height: 38px;
           border-radius: 50%;
-          background-color: var(--nav-menu-bg);
+          background-color: var(--color-surface-card);
           border: 1px solid var(--nav-menu-border);
           color: var(--nav-text);
-          backdrop-filter: blur(12px);
           transition: all 0.2s ease;
         }
 
@@ -135,12 +172,12 @@ export const Navbar: React.FC = () => {
         }
 
         .navbar-cta {
-          padding: 10px 22px;
-          font-size: 0.9rem;
+          padding: 8px 20px;
+          font-size: 0.85rem;
           border-radius: 9999px;
         }
 
-        @media (max-width: 868px) {
+        @media (max-width: 768px) {
           .navbar-menu {
             display: none;
           }

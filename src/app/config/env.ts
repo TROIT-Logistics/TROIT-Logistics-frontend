@@ -10,8 +10,14 @@ export interface AppEnvConfig {
   isProd: boolean;
 }
 
+const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+// Ensure apiBaseUrl ends with /v1
+const normalizedApiBaseUrl = rawBaseUrl.endsWith('/v1') 
+  ? rawBaseUrl 
+  : `${rawBaseUrl.replace(/\/$/, '')}/v1`;
+
 export const envConfig: AppEnvConfig = {
-  apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
+  apiBaseUrl: normalizedApiBaseUrl,
   appName: import.meta.env.VITE_APP_NAME || 'TROIT Logistics',
   isDev: import.meta.env.DEV,
   isProd: import.meta.env.PROD,
