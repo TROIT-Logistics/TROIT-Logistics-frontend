@@ -7,6 +7,7 @@ import { getProductImage } from '@/lib/utils/productImages';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { ShieldCheck, Search, Sparkles, ShoppingBag, ArrowRight } from 'lucide-react';
+import { VisualSearchButton, VisualSearchModal } from '@/features/buyer/components';
 
 export const BuyerPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -14,6 +15,7 @@ export const BuyerPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSeeding, setIsSeeding] = useState(false);
+  const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
 
   const loadProducts = async () => {
     setIsLoading(true);
@@ -83,23 +85,28 @@ export const BuyerPage: React.FC = () => {
             border: '1px solid var(--color-border-light)',
           }}
         >
-          <div style={{ position: 'relative', flex: '1 1 300px', maxWidth: '480px' }}>
-            <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-light)' }} />
-            <input
-              type="text"
-              placeholder="Search verified smartphones, laptops, electronics..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px 12px 10px 38px',
-                borderRadius: 'var(--radius-pill)',
-                border: '1px solid var(--color-border-light)',
-                backgroundColor: 'var(--color-bg-page)',
-                color: 'var(--color-text-main)',
-                fontSize: '0.9rem',
-              }}
-            />
+          {/* Combined Text Search & Camera Action Bar */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', flex: '1 1 400px', maxWidth: '680px', alignItems: 'center' }}>
+            <div style={{ position: 'relative', flex: '1 1 240px' }}>
+              <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-light)' }} />
+              <input
+                type="text"
+                placeholder="Search verified smartphones, laptops, electronics..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px 10px 38px',
+                  borderRadius: 'var(--radius-pill)',
+                  border: '1px solid var(--color-border-light)',
+                  backgroundColor: 'var(--color-bg-page)',
+                  color: 'var(--color-text-main)',
+                  fontSize: '0.9rem',
+                }}
+              />
+            </div>
+
+            <VisualSearchButton onClick={() => setIsVisualSearchOpen(true)} />
           </div>
 
           <div style={{ display: 'flex', gap: '12px' }}>
@@ -116,6 +123,7 @@ export const BuyerPage: React.FC = () => {
             </Link>
           </div>
         </div>
+
 
         {/* Error Banner */}
         {error && (
@@ -285,9 +293,12 @@ export const BuyerPage: React.FC = () => {
         )}
       </main>
 
+      <VisualSearchModal isOpen={isVisualSearchOpen} onClose={() => setIsVisualSearchOpen(false)} />
+
       <Footer />
     </div>
   );
 };
 
 export default BuyerPage;
+

@@ -82,3 +82,29 @@ export interface SeedResponse {
   demo_password: string;
   seeded_products: Product[];
 }
+
+export interface VisualSearchQueryInfo {
+  category?: string;
+  brand?: string;
+  model?: string;
+  description?: string;
+  confidence?: number;
+}
+
+export interface VisualSearchMatchItem {
+  id: string;
+  name: string;
+  price: number;
+  stock: number;
+  condition: string;
+  verification_status: ProductVerificationStatus;
+  image_url?: string;
+  match_score?: number;
+  description?: string;
+}
+
+export interface VisualSearchResponse {
+  query?: VisualSearchQueryInfo;
+  matches: VisualSearchMatchItem[];
+}
+
