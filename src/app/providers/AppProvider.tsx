@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryProvider } from './QueryProvider';
+import { AuthProvider } from '@/context/AuthContext';
+import { SellerVerificationProvider } from '@/context/SellerVerificationContext';
 
 export interface AppProviderProps {
   children: React.ReactNode;
@@ -8,12 +10,16 @@ export interface AppProviderProps {
 
 /**
  * Global Application Provider Composition.
- * Future providers (e.g. AuthProvider, ThemeProvider) should be composed here.
+ * Composes QueryProvider, AuthProvider, SellerVerificationProvider, and BrowserRouter.
  */
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   return (
     <QueryProvider>
-      <BrowserRouter>{children}</BrowserRouter>
+      <AuthProvider>
+        <SellerVerificationProvider>
+          <BrowserRouter>{children}</BrowserRouter>
+        </SellerVerificationProvider>
+      </AuthProvider>
     </QueryProvider>
   );
 };

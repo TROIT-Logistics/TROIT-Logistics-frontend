@@ -80,10 +80,10 @@ export const HeroSection: React.FC = () => {
 
         .hero-card {
           max-width: 480px;
-          background: rgba(10, 15, 25, 0.76);
+          background: rgba(10, 15, 25, 0.45);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.14);
+          border: 1px solid rgba(255, 255, 255, 0.18);
           border-radius: 20px;
           padding: 2.5rem;
           color: #FFFFFF;
