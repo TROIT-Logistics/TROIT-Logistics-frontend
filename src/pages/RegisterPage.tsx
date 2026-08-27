@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
 import { registerUser } from '@/lib/api/auth';
 import { UserRole } from '@/lib/api/types';
+import { useAuth } from '@/context/AuthContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { UserPlus, ArrowRight, Lock, Mail, User as UserIcon, Phone } from 'lucide-react';
+import { ArrowRight, User, Mail, Lock, ShoppingBag, Store } from 'lucide-react';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -13,7 +13,6 @@ export const RegisterPage: React.FC = () => {
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>('buyer');
 
@@ -27,9 +26,8 @@ export const RegisterPage: React.FC = () => {
 
     try {
       const res = await registerUser({
-        full_name: fullName,
-        email,
-        phone_number: phone || undefined,
+        full_name: fullName.trim(),
+        email: email.trim(),
         password,
         role,
       });
@@ -43,7 +41,7 @@ export const RegisterPage: React.FC = () => {
         }
       }
     } catch (err) {
-      setError((err as Error).message || 'Registration failed. Please check inputs.');
+      setError((err as Error).message || 'Registration failed. Try a different email.');
     } finally {
       setIsLoading(false);
     }
@@ -65,23 +63,24 @@ export const RegisterPage: React.FC = () => {
             boxShadow: 'var(--shadow-md)',
           }}
         >
+          {/* Header with TROIT Logo */}
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255, 77, 0, 0.1)',
-                color: 'var(--color-orange-primary)',
-                marginBottom: '12px',
-              }}
-            >
-              <UserPlus size={24} />
-            </div>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '6px' }}>Create TROIT Account</h2>
+            <Link to="/" style={{ display: 'inline-block', marginBottom: '8px' }}>
+              <span
+                style={{
+                  fontSize: '2.5rem',
+                  fontWeight: 900,
+                  letterSpacing: '-0.04em',
+                  color: 'var(--color-orange-primary)',
+                  display: 'block',
+                }}
+              >
+                TROIT
+              </span>
+            </Link>
+            <h2 style={{ fontSize: '1.65rem', fontWeight: 800, marginBottom: '6px', color: 'var(--color-text-main)' }}>
+              Create TROIT Account
+            </h2>
             <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
               Join Port Harcourt's verified logistics network
             </p>
@@ -104,44 +103,52 @@ export const RegisterPage: React.FC = () => {
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* Account Role Selector */}
+            {/* Account Role Toggle */}
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px' }}>
                 Account Type
               </label>
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ display: 'flex', gap: '12px' }}>
                 <button
                   type="button"
+                  onClick={() => setRole('buyer')}
                   style={{
                     flex: 1,
                     padding: '10px',
                     borderRadius: '8px',
                     border: role === 'buyer' ? '2px solid var(--color-orange-primary)' : '1px solid var(--color-border-light)',
-                    backgroundColor: role === 'buyer' ? 'rgba(255, 77, 0, 0.08)' : 'var(--color-surface-card)',
+                    backgroundColor: role === 'buyer' ? 'rgba(255, 77, 0, 0.1)' : 'var(--color-surface-card)',
                     color: role === 'buyer' ? 'var(--color-orange-primary)' : 'var(--color-text-main)',
                     fontWeight: 700,
                     fontSize: '0.85rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
                   }}
-                  onClick={() => setRole('buyer')}
                 >
-                  🛒 I am a Buyer
+                  <ShoppingBag size={16} /> Buyer Account
                 </button>
 
                 <button
                   type="button"
+                  onClick={() => setRole('seller')}
                   style={{
                     flex: 1,
                     padding: '10px',
                     borderRadius: '8px',
                     border: role === 'seller' ? '2px solid var(--color-orange-primary)' : '1px solid var(--color-border-light)',
-                    backgroundColor: role === 'seller' ? 'rgba(255, 77, 0, 0.08)' : 'var(--color-surface-card)',
+                    backgroundColor: role === 'seller' ? 'rgba(255, 77, 0, 0.1)' : 'var(--color-surface-card)',
                     color: role === 'seller' ? 'var(--color-orange-primary)' : 'var(--color-text-main)',
                     fontWeight: 700,
                     fontSize: '0.85rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
                   }}
-                  onClick={() => setRole('seller')}
                 >
-                  🏪 I am a Seller
+                  <Store size={16} /> Seller Account
                 </button>
               </div>
             </div>
@@ -151,11 +158,11 @@ export const RegisterPage: React.FC = () => {
                 Full Name
               </label>
               <div style={{ position: 'relative' }}>
-                <UserIcon size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-light)' }} />
+                <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-light)' }} />
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Amaka Okorie"
+                  placeholder="Chidi Amadi"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   style={{
@@ -180,33 +187,9 @@ export const RegisterPage: React.FC = () => {
                 <input
                   type="email"
                   required
-                  placeholder="name@domain.com"
+                  placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px 10px 38px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--color-border-light)',
-                    backgroundColor: 'var(--color-bg-page)',
-                    color: 'var(--color-text-main)',
-                    fontSize: '0.9rem',
-                  }}
-                />
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>
-                Phone Number (Optional)
-              </label>
-              <div style={{ position: 'relative' }}>
-                <Phone size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-light)' }} />
-                <input
-                  type="text"
-                  placeholder="+2348012345678"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
                   style={{
                     width: '100%',
                     padding: '10px 12px 10px 38px',
@@ -229,7 +212,7 @@ export const RegisterPage: React.FC = () => {
                 <input
                   type="password"
                   required
-                  placeholder="At least 8 characters"
+                  placeholder="At least 6 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   style={{
@@ -251,7 +234,7 @@ export const RegisterPage: React.FC = () => {
               disabled={isLoading}
               style={{ width: '100%', padding: '12px', borderRadius: '8px' }}
             >
-              {isLoading ? 'Creating Account...' : 'Register'} <ArrowRight size={18} />
+              {isLoading ? 'Creating Account...' : 'Register Account'} <ArrowRight size={18} />
             </button>
           </form>
 

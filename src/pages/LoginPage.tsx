@@ -5,7 +5,7 @@ import { loginUser } from '@/lib/api/auth';
 import { seedDemoData } from '@/lib/api/seed';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Shield, Sparkles, ArrowRight, Lock, Mail } from 'lucide-react';
+import { Sparkles, ArrowRight, Lock, Mail } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -107,23 +107,24 @@ export const LoginPage: React.FC = () => {
             boxShadow: 'var(--shadow-md)',
           }}
         >
+          {/* Header with TROIT Logo */}
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255, 77, 0, 0.1)',
-                color: 'var(--color-orange-primary)',
-                marginBottom: '12px',
-              }}
-            >
-              <Shield size={24} />
-            </div>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '6px' }}>Sign in to TROIT</h2>
+            <Link to="/" style={{ display: 'inline-block', marginBottom: '8px' }}>
+              <span
+                style={{
+                  fontSize: '2.5rem',
+                  fontWeight: 900,
+                  letterSpacing: '-0.04em',
+                  color: 'var(--color-orange-primary)',
+                  display: 'block',
+                }}
+              >
+                TROIT
+              </span>
+            </Link>
+            <h2 style={{ fontSize: '1.65rem', fontWeight: 800, marginBottom: '6px', color: 'var(--color-text-main)' }}>
+              Sign in to TROIT
+            </h2>
             <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
               Access Port Harcourt's trusted logistics marketplace
             </p>
