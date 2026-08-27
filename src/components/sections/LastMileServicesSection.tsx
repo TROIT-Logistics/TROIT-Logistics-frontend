@@ -3,7 +3,7 @@ import { ArrowUpRight } from 'lucide-react';
 import standardImg from '@/assets/images/last_mile_yellow.png';
 import expressImg from '@/assets/images/last_mile_van_loading.png';
 import contactlessImg from '@/assets/images/people_reviewing_tablet.png';
-import scheduledImg from '@/assets/images/people_reviewing_tablet.png';
+import scheduledImg from '@/assets/images/truck_driver_smile.png';
 
 export const LastMileServicesSection: React.FC = () => {
   return (
