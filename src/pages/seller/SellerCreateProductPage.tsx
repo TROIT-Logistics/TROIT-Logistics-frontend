@@ -5,7 +5,10 @@ import { useSellerVerification } from '@/context/SellerVerificationContext';
 import { useAuth } from '@/context/AuthContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { ArrowLeft, PlusCircle, ShieldAlert, ArrowRight } from 'lucide-react';
+import { ArrowLeft, PlusCircle, ShieldAlert, UploadCloud, X, Sparkles } from 'lucide-react';
+import iphoneImg from '@/assets/images/product_iphone14pro.png';
+import samsungImg from '@/assets/images/product_samsung23ultra.png';
+import hpSpectreImg from '@/assets/images/product_hpspectre.png';
 
 export const SellerCreateProductPage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,12 +20,39 @@ export const SellerCreateProductPage: React.FC = () => {
   const [price, setPrice] = useState('');
   const [condition, setCondition] = useState('Grade A - Like New');
   const [stock, setStock] = useState('1');
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [customUrlInput, setCustomUrlInput] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Unverified seller protection check
   const isUnverified = user?.role === 'seller' && status !== 'VERIFIED' && user.email !== 'seller@demo.troit';
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files);
+      const newUrls = newFiles.map((file) => URL.createObjectURL(file));
+      setImageUrls((prev) => [...prev, ...newUrls]);
+    }
+  };
+
+  const handleAddCustomUrl = () => {
+    if (customUrlInput.trim()) {
+      setImageUrls((prev) => [...prev, customUrlInput.trim()]);
+      setCustomUrlInput('');
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImageUrls((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAddPresetImage = (url: string) => {
+    if (!imageUrls.includes(url)) {
+      setImageUrls((prev) => [...prev, url]);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,27 +135,27 @@ export const SellerCreateProductPage: React.FC = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '64px',
-                  height: '64px',
+                  width: '56px',
+                  height: '56px',
                   borderRadius: '50%',
-                  backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
                   color: '#EF4444',
-                  marginBottom: '20px',
+                  marginBottom: '16px',
                 }}
               >
-                <ShieldAlert size={36} />
+                <ShieldAlert size={32} />
               </div>
 
               <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '8px' }}>
-                Seller verification required
+                Verification Required
               </h2>
 
-              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.925rem', marginBottom: '28px', lineHeight: 1.6 }}>
-                You must complete seller verification before you can list products on TROIT.
+              <p style={{ color: 'var(--color-text-muted)', marginBottom: '24px', fontSize: '0.9rem', lineHeight: 1.6 }}>
+                You must complete your seller onboarding verification before you can list items on TROIT.
               </p>
 
               <Link to="/seller/verification" className="btn btn-orange" style={{ padding: '12px 28px', fontSize: '1rem', width: '100%', justifyContent: 'center' }}>
-                Complete Verification <ArrowRight size={18} />
+                Complete Seller Verification
               </Link>
             </div>
           ) : (
@@ -134,9 +164,10 @@ export const SellerCreateProductPage: React.FC = () => {
                 backgroundColor: 'var(--color-surface)',
                 border: '1px solid var(--color-border-light)',
                 borderRadius: 'var(--radius-lg)',
-                padding: '36px',
+                padding: '32px 28px',
                 boxShadow: 'var(--shadow-md)',
               }}
+              className="mobile-card-padding"
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
                 <div
@@ -178,6 +209,151 @@ export const SellerCreateProductPage: React.FC = () => {
               )}
 
               <form onSubmit={handleSubmit}>
+                {/* Product Photos Upload Box */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px' }}>
+                    Product Photos & Inspection Images
+                  </label>
+
+                  {/* Dropzone Upload Area */}
+                  <div
+                    style={{
+                      border: '2px dashed var(--color-orange-primary)',
+                      borderRadius: 'var(--radius-md)',
+                      backgroundColor: 'rgba(255, 77, 0, 0.04)',
+                      padding: '24px 16px',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      marginBottom: '12px',
+                    }}
+                  >
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        opacity: 0,
+                        cursor: 'pointer',
+                        width: '100%',
+                        height: '100%',
+                      }}
+                    />
+                    <UploadCloud size={32} style={{ color: 'var(--color-orange-primary)', margin: '0 auto 8px' }} />
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-main)' }}>
+                      Click or Drag Product Photos Here
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                      PNG, JPG, WEBP up to 10MB per photo
+                    </div>
+                  </div>
+
+                  {/* Quick Preset Photos Selection */}
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '6px' }}>
+                      <Sparkles size={12} style={{ display: 'inline', marginRight: '4px' }} /> Quick sample photos for demo:
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleAddPresetImage(iphoneImg)}
+                        className="btn btn-dark"
+                        style={{ fontSize: '0.75rem', padding: '6px 12px' }}
+                      >
+                        + iPhone 14 Pro
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleAddPresetImage(samsungImg)}
+                        className="btn btn-dark"
+                        style={{ fontSize: '0.75rem', padding: '6px 12px' }}
+                      >
+                        + Galaxy S23
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleAddPresetImage(hpSpectreImg)}
+                        className="btn btn-dark"
+                        style={{ fontSize: '0.75rem', padding: '6px 12px' }}
+                      >
+                        + HP Laptop
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Optional Image URL Input */}
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                    <input
+                      type="url"
+                      placeholder="Or paste photo URL link..."
+                      value={customUrlInput}
+                      onChange={(e) => setCustomUrlInput(e.target.value)}
+                      style={{
+                        flex: 1,
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--color-border-light)',
+                        backgroundColor: 'var(--color-bg-page)',
+                        color: 'var(--color-text-main)',
+                        fontSize: '0.85rem',
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddCustomUrl}
+                      className="btn btn-dark"
+                      style={{ padding: '8px 14px', fontSize: '0.8rem' }}
+                    >
+                      Add Photo
+                    </button>
+                  </div>
+
+                  {/* Thumbnail Gallery Preview */}
+                  {imageUrls.length > 0 && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '10px', marginTop: '12px' }}>
+                      {imageUrls.map((url, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            position: 'relative',
+                            width: '100%',
+                            height: '80px',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                            border: '1px solid var(--color-border-light)',
+                            backgroundColor: '#000000',
+                          }}
+                        >
+                          <img src={url} alt={`Upload ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(idx)}
+                            style={{
+                              position: 'absolute',
+                              top: '4px',
+                              right: '4px',
+                              backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                              color: '#FFFFFF',
+                              borderRadius: '50%',
+                              width: '20px',
+                              height: '20px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: 0,
+                            }}
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 <div style={{ marginBottom: '16px' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>
                     Product Title
@@ -223,7 +399,7 @@ export const SellerCreateProductPage: React.FC = () => {
                   />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }} className="grid-2col-responsive">
                   <div>
                     <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>
                       Price (₦)

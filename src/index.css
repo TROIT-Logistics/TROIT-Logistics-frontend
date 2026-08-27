@@ -200,15 +200,71 @@ img {
 
 /* Typography Utility */
 .section-title {
-  font-size: 2.25rem;
+  font-size: clamp(1.65rem, 4vw, 2.5rem);
   font-weight: 800;
   color: var(--color-text-main);
   line-height: 1.25;
   letter-spacing: -0.02em;
 }
 
-@media (min-width: 768px) {
-  .section-title {
-    font-size: 2.75rem;
+/* Global Mobile Responsiveness Adjustments */
+@media (max-width: 640px) {
+  html {
+    font-size: 15px;
+  }
+
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Make form containers and cards responsive on mobile */
+  .auth-card,
+  .hero-card,
+  .mobile-card-padding {
+    padding: 1.25rem !important;
+  }
+
+  .hero-section {
+    padding-top: 100px !important;
+    padding-bottom: 40px !important;
+  }
+
+  .hero-title {
+    font-size: 1.85rem !important;
+    margin-bottom: 0.85rem !important;
+  }
+
+  .hero-subtitle {
+    font-size: 0.925rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .hero-actions {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  .hero-actions .hero-btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Single-column grid overrides for mobile screens */
+  .grid-2col-responsive,
+  .grid-3col-responsive,
+  .grid-4col-responsive {
+    grid-template-columns: 1fr !important;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    font-size: 0.875rem;
+  }
+
+  /* Mobile text wraps gracefully without breaking lines awkwardly */
+  h1, h2, h3 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 }

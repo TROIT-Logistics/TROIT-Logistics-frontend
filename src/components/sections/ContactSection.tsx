@@ -33,7 +33,7 @@ export const ContactSection: React.FC = () => {
 
           <h2
             className="section-title"
-            style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '16px', maxWidth: '640px', margin: '0 auto 16px', lineHeight: 1.25 }}
+            style={{ fontWeight: 900, marginBottom: '16px', maxWidth: '640px', margin: '0 auto 16px', lineHeight: 1.25 }}
           >
             Let's build a more trusted way to move products.
           </h2>

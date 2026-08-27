@@ -26,7 +26,7 @@ export const ServicesSection: React.FC = () => {
               SERVICES
             </div>
 
-            <h2 className="section-title" style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '20px', lineHeight: 1.2 }}>
+            <h2 className="section-title" style={{ fontWeight: 800, marginBottom: '20px', lineHeight: 1.2 }}>
               Trusted Commerce & Logistics
             </h2>
 

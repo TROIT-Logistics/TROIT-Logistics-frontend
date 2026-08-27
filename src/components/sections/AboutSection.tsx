@@ -44,7 +44,7 @@ export const AboutSection: React.FC = () => {
               ABOUT TROIT
             </div>
 
-            <h2 className="section-title" style={{ fontSize: '2.5rem', fontWeight: 800, lineHeight: 1.2 }}>
+            <h2 className="section-title" style={{ fontWeight: 800, lineHeight: 1.2 }}>
               A More Trusted Way to Move Products
             </h2>
           </div>
