@@ -9,6 +9,8 @@ import BuyerOrdersPage from '@/pages/buyer/BuyerOrdersPage';
 import OrderDetailsPage from '@/pages/buyer/OrderDetailsPage';
 import SellerDashboardPage from '@/pages/seller/SellerDashboardPage';
 import SellerCreateProductPage from '@/pages/seller/SellerCreateProductPage';
+import SellerVerificationPage from '@/pages/seller/SellerVerificationPage';
+import SellerVerificationStatusPage from '@/pages/seller/SellerVerificationStatusPage';
 import { useAuth } from '@/context/AuthContext';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRole?: string }> = ({
@@ -60,6 +62,24 @@ export const AppRouter: React.FC = () => {
         element={
           <ProtectedRoute>
             <OrderDetailsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Seller Verification Onboarding */}
+      <Route
+        path="/seller/verification"
+        element={
+          <ProtectedRoute allowedRole="seller">
+            <SellerVerificationPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/seller/verification/status"
+        element={
+          <ProtectedRoute allowedRole="seller">
+            <SellerVerificationStatusPage />
           </ProtectedRoute>
         }
       />

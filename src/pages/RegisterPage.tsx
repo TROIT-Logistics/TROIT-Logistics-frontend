@@ -5,7 +5,7 @@ import { UserRole } from '@/lib/api/types';
 import { useAuth } from '@/context/AuthContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { ArrowRight, User, Mail, Lock, ShoppingBag, Store } from 'lucide-react';
+import { ArrowRight, User, Mail, Lock, ShoppingBag, Store, ShieldCheck } from 'lucide-react';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -35,8 +35,10 @@ export const RegisterPage: React.FC = () => {
       if (res.token && res.user) {
         login(res.token, res.user);
         if (res.user.role === 'seller') {
-          navigate('/seller');
+          // Redirect seller to verification onboarding workflow
+          navigate('/seller/verification');
         } else {
+          // Direct access for buyers
           navigate('/buyer');
         }
       }
@@ -108,7 +110,7 @@ export const RegisterPage: React.FC = () => {
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px' }}>
                 Account Type
               </label>
-              <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
                 <button
                   type="button"
                   onClick={() => setRole('buyer')}
@@ -151,6 +153,27 @@ export const RegisterPage: React.FC = () => {
                   <Store size={16} /> Seller Account
                 </button>
               </div>
+
+              {/* Seller Verification Notice */}
+              {role === 'seller' && (
+                <div
+                  style={{
+                    backgroundColor: 'rgba(255, 77, 0, 0.08)',
+                    border: '1px solid rgba(255, 77, 0, 0.25)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '12px 14px',
+                    fontSize: '0.825rem',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 800, color: 'var(--color-orange-primary)', marginBottom: '4px' }}>
+                    <ShieldCheck size={16} /> Seller accounts require verification before you can start selling on TROIT.
+                  </div>
+                  <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
+                    We verify sellers to help create a safer and more trusted marketplace for buyers.
+                  </div>
+                </div>
+              )}
             </div>
 
             <div style={{ marginBottom: '16px' }}>
@@ -234,7 +257,8 @@ export const RegisterPage: React.FC = () => {
               disabled={isLoading}
               style={{ width: '100%', padding: '12px', borderRadius: '8px' }}
             >
-              {isLoading ? 'Creating Account...' : 'Register Account'} <ArrowRight size={18} />
+              {isLoading ? 'Creating Account...' : role === 'seller' ? 'Continue to Seller Verification' : 'Register Account'}{' '}
+              <ArrowRight size={18} />
             </button>
           </form>
 

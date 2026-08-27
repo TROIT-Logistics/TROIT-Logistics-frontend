@@ -1,19 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { fetchProducts, verifyProduct } from '@/lib/api/products';
 import { fetchOrders } from '@/lib/api/orders';
 import { Product, Order } from '@/lib/api/types';
 import { getProductImage } from '@/lib/utils/productImages';
+import { useSellerVerification } from '@/context/SellerVerificationContext';
+import { useAuth } from '@/context/AuthContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Plus, Sparkles } from 'lucide-react';
+import { Plus, Sparkles, ShieldCheck } from 'lucide-react';
 
 export const SellerDashboardPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { status } = useSellerVerification();
+
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionMsg, setActionMsg] = useState<string | null>(null);
+
+  // Unverified seller protection redirect
+  useEffect(() => {
+    if (user?.role === 'seller' && status !== 'VERIFIED' && user.email !== 'seller@demo.troit') {
+      navigate('/seller/verification/status');
+    }
+  }, [user, status, navigate]);
 
   const loadData = async () => {
     setIsLoading(true);
@@ -53,10 +66,30 @@ export const SellerDashboardPage: React.FC = () => {
       <Navbar />
 
       <main style={{ flex: 1, padding: '110px 20px 60px' }} className="container">
-        {/* Header */}
+        {/* Header with VERIFIED SELLER badge */}
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
           <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Seller Dashboard</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+              <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Seller Dashboard</h1>
+              {status === 'VERIFIED' && (
+                <span
+                  style={{
+                    fontSize: '0.75rem',
+                    fontWeight: 800,
+                    padding: '4px 12px',
+                    borderRadius: 'var(--radius-pill)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    color: '#10B981',
+                    border: '1px solid #10B981',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <ShieldCheck size={14} /> VERIFIED SELLER
+                </span>
+              )}
+            </div>
             <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
               Manage products, view verification statuses, and monitor orders
             </p>
