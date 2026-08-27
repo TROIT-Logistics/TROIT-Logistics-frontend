@@ -22,11 +22,11 @@ Nigerian online commerce suffers from severe trust, verification, and logistics 
 
 ### Supported User Roles
 The platform architecture supports 5 core user roles:
-* 🛒 **Buyer**: Product discovery, verified inventory browsing, protected payment, delivery tracking, disputes.
-* 🏪 **Seller**: Registration, KYC onboarding, listing verified inventory, order tracking, trust progression.
-* 🛵 **Rider**: Assigned pickups, on-site condition checklist & photo evidence logging, delivery confirmation.
-* 📋 **Field Agent**: Physical store verification, inventory quality grading, inspection reporting.
-* 📊 **Admin**: Operational monitoring, KYC approvals, trust score management, dispute resolution, pilot KPIs.
+*  **Buyer**: Product discovery, verified inventory browsing, protected payment, delivery tracking, disputes.
+*  **Seller**: Registration, KYC onboarding, listing verified inventory, order tracking, trust progression.
+*  **Rider**: Assigned pickups, on-site condition checklist & photo evidence logging, delivery confirmation.
+*  **Field Agent**: Physical store verification, inventory quality grading, inspection reporting.
+*  **Admin**: Operational monitoring, KYC approvals, trust score management, dispute resolution, pilot KPIs.
 
 ---
 
@@ -44,10 +44,10 @@ To ensure architectural clarity, understand what is already provided in this set
 * ✅ Git branching, commit standard, and PR process guidelines.
 
 ### Scope to be Built by Interns (Your Assignments)
-* 🚀 Feature components, forms, and pages for assigned user stories.
-* 🚀 Zod validation schemas for feature forms.
-* 🚀 Feature-specific TanStack Query hooks and API integration calls.
-* 🚀 Responsive mobile-first UI views aligned with approved Figma designs.
+*  Feature components, forms, and pages for assigned user stories.
+*  Zod validation schemas for feature forms.
+*  Feature-specific TanStack Query hooks and API integration calls.
+*  Responsive mobile-first UI views aligned with approved Figma designs.
 
 ---
 
@@ -336,7 +336,7 @@ Follow this step-by-step workflow for every assigned task:
 13. Merge to develop
 ```
 
-> 💡 **Important Rule**: If product requirements or API contracts are ambiguous or missing, **do NOT invent product behavior**. Immediately seek clarification from your mentor or product team.
+>  **Important Rule**: If product requirements or API contracts are ambiguous or missing, **do NOT invent product behavior**. Immediately seek clarification from your mentor or product team.
 
 ---
 
