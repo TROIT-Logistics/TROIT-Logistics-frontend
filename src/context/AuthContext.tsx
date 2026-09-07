@@ -54,21 +54,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (res.user) {
         setUser(res.user);
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(res.user));
+      } else {
+        logout();
       }
     } catch {
-      // Keep existing stored local user for MVP presentation offline mode
-      const storedUser = localStorage.getItem(USER_STORAGE_KEY);
-      if (storedUser) {
-        try {
-          setUser(JSON.parse(storedUser));
-        } catch {
-          // ignore error
-        }
-      }
+      // Backend rejected token or returned 401/error — clear authentication
+      logout();
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [logout]);
 
   useEffect(() => {
     refreshUser();
@@ -99,6 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {

@@ -1,5 +1,5 @@
 import apiClient from './client';
-import { ApiResponse, Order, OrderStatus, PickupInspection } from './types';
+import { ApiResponse, ConfirmDeliveryRequest, FundOrderRequest, Order, OrderStatus, PickupInspection } from './types';
 
 export interface CreateOrderPayload {
   product_id: string;
@@ -52,10 +52,33 @@ export const createPickupInspection = async (
   return res.data.data;
 };
 
-export const confirmDelivery = async (id: string): Promise<Order> => {
-  const res = await apiClient.post<ApiResponse<Order>>(`/orders/${id}/confirm-delivery`);
+export const fundOrder = async (id: string, payload?: FundOrderRequest): Promise<Order> => {
+  const res = await apiClient.post<ApiResponse<Order>>(`/orders/${id}/fund`, payload || {});
+  if (!res.data.data) {
+    throw new Error('Failed to fund order');
+  }
+  return res.data.data;
+};
+
+export interface OrderStatusHistoryItem {
+  id: string;
+  order_id: string;
+  status: string;
+  metadata?: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export const fetchOrderHistory = async (id: string): Promise<OrderStatusHistoryItem[]> => {
+  const res = await apiClient.get<ApiResponse<OrderStatusHistoryItem[]>>(`/orders/${id}/history`);
+  return res.data.data || [];
+};
+
+export const confirmDelivery = async (id: string, payload?: ConfirmDeliveryRequest): Promise<Order> => {
+  const res = await apiClient.post<ApiResponse<Order>>(`/orders/${id}/confirm-delivery`, payload || {});
   if (!res.data.data) {
     throw new Error('Failed to confirm delivery');
   }
   return res.data.data;
 };
+
+

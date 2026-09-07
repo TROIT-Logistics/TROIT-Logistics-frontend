@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Sun, Moon, LogOut, User as UserIcon, ShoppingBag, Store, Menu, X } from 'lucide-react';
+import { Sun, Moon, LogOut, User as UserIcon, ShoppingBag, Store, Menu, X, ShieldCheck } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 
@@ -67,6 +67,9 @@ export const Navbar: React.FC = () => {
           </Link>
           <Link to="/seller" className="nav-item" style={{ fontSize: '0.8rem' }}>
             <Store size={14} /> Seller Hub
+          </Link>
+          <Link to="/verification" className="nav-item" style={{ fontSize: '0.8rem' }}>
+            <ShieldCheck size={14} /> Trust Centre
           </Link>
         </nav>
 

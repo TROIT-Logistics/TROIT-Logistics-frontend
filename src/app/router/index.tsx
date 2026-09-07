@@ -3,11 +3,14 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from '@/pages/LandingPage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
+import VerificationCentrePage from '@/pages/VerificationCentrePage';
+import GradeExplanationPage from '@/pages/GradeExplanationPage';
 import BuyerPage from '@/pages/buyer/BuyerPage';
 import ProductDetailsPage from '@/pages/buyer/ProductDetailsPage';
 import BuyerOrdersPage from '@/pages/buyer/BuyerOrdersPage';
 import OrderDetailsPage from '@/pages/buyer/OrderDetailsPage';
 import SellerDashboardPage from '@/pages/seller/SellerDashboardPage';
+import SellerProfilePage from '@/pages/seller/SellerProfilePage';
 import SellerCreateProductPage from '@/pages/seller/SellerCreateProductPage';
 import SellerVerificationPage from '@/pages/seller/SellerVerificationPage';
 import SellerVerificationStatusPage from '@/pages/seller/SellerVerificationStatusPage';
@@ -45,6 +48,9 @@ export const AppRouter: React.FC = () => {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/verification" element={<VerificationCentrePage />} />
+      <Route path="/grade-explanation" element={<GradeExplanationPage />} />
+      <Route path="/seller/profile/:id" element={<SellerProfilePage />} />
 
       {/* Buyer Marketplace & Orders */}
       <Route path="/buyer" element={<BuyerPage />} />
@@ -107,5 +113,6 @@ export const AppRouter: React.FC = () => {
     </Routes>
   );
 };
+
 
 export default AppRouter;

@@ -3,19 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useSellerVerification } from '@/context/SellerVerificationContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { ShieldCheck, Clock, Sparkles, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Clock, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export const SellerVerificationStatusPage: React.FC = () => {
   const navigate = useNavigate();
-  const { status, verificationData, setVerificationStatus } = useSellerVerification();
-
-  const handleSimulateApprove = () => {
-    setVerificationStatus('VERIFIED');
-  };
-
-  const handleSimulatePending = () => {
-    setVerificationStatus('UNDER_REVIEW');
-  };
+  const { status, verificationData } = useSellerVerification();
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -149,33 +141,6 @@ export const SellerVerificationStatusPage: React.FC = () => {
                 Product listing is restricted while your verification application is under review.
               </div>
             )}
-          </div>
-
-          {/* Demo Controls Box for Presentation */}
-          <div
-            style={{
-              backgroundColor: 'var(--color-surface-card)',
-              border: '1px dashed var(--color-border-light)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '24px',
-              textAlign: 'center',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-orange-primary)', marginBottom: '12px' }}>
-              <Sparkles size={16} /> DEMO PRESENTATION ADMIN CONTROLS
-            </div>
-            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '16px' }}>
-              Use these buttons during presentation to simulate admin review approval:
-            </p>
-
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-              <button onClick={handleSimulateApprove} className="btn btn-orange" style={{ fontSize: '0.8rem' }}>
-                Simulate Admin Verification Approval (VERIFIED)
-              </button>
-              <button onClick={handleSimulatePending} className="btn btn-dark" style={{ fontSize: '0.8rem' }}>
-                Reset Status to UNDER_REVIEW
-              </button>
-            </div>
           </div>
         </div>
       </main>
