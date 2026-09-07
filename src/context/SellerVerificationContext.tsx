@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
+import { fetchSellerVerification, submitSellerVerification as submitVerificationApi } from '@/lib/api/seller';
 
 export type VerificationStatus = 'NOT_STARTED' | 'PENDING' | 'UNDER_REVIEW' | 'VERIFIED' | 'REJECTED';
 
@@ -16,8 +17,8 @@ export interface SellerVerificationData {
 interface SellerVerificationContextType {
   status: VerificationStatus;
   verificationData: SellerVerificationData | null;
-  submitVerification: (data: SellerVerificationData) => void;
-  setVerificationStatus: (status: VerificationStatus) => void;
+  submitVerification: (data: SellerVerificationData) => Promise<void>;
+  refreshVerification: () => Promise<void>;
   resetVerification: () => void;
 }
 
@@ -30,60 +31,74 @@ export const SellerVerificationProvider: React.FC<{ children: React.ReactNode }>
   const [status, setStatus] = useState<VerificationStatus>('NOT_STARTED');
   const [verificationData, setVerificationData] = useState<SellerVerificationData | null>(null);
 
-  useEffect(() => {
+  const refreshVerification = useCallback(async () => {
     if (!user) {
       setStatus('NOT_STARTED');
       setVerificationData(null);
       return;
     }
 
-    // Demo seller account is pre-verified for presentation convenience unless overwritten
-    if (user.email === 'seller@demo.troit') {
-      const stored = localStorage.getItem(`${STORAGE_PREFIX}${user.id}`);
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          setStatus(parsed.status || 'VERIFIED');
-          setVerificationData(parsed.data || null);
-          return;
-        } catch {
-          // fallback to demo verified
+    if (user.role === 'seller' || user.role === 'admin') {
+      try {
+        const res = await fetchSellerVerification();
+        const apiStatus = (res.verification_status as VerificationStatus) || 'PENDING';
+        setStatus(apiStatus);
+
+        const stored = localStorage.getItem(`${STORAGE_PREFIX}${user.id}`);
+        let localMeta: Partial<SellerVerificationData> = {};
+        if (stored) {
+          try {
+            localMeta = JSON.parse(stored).data || {};
+          } catch {
+            // ignore
+          }
+        }
+
+        if (res.store_name || res.store_address || localMeta.business_name) {
+          setVerificationData({
+            id_type: localMeta.id_type || 'NIN National Identity Number',
+            id_number: localMeta.id_number || 'Submitted ID',
+            business_name: res.store_name || localMeta.business_name || '',
+            business_address: res.store_address || localMeta.business_address || '',
+            product_category: localMeta.product_category || 'Consumer Electronics',
+            physical_verification_consent: localMeta.physical_verification_consent ?? true,
+            submitted_at: localMeta.submitted_at,
+          });
+        }
+      } catch {
+        const stored = localStorage.getItem(`${STORAGE_PREFIX}${user.id}`);
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            setStatus(parsed.status || 'PENDING');
+            setVerificationData(parsed.data || null);
+          } catch {
+            setStatus('NOT_STARTED');
+          }
+        } else {
+          setStatus('PENDING');
         }
       }
-      setStatus('VERIFIED');
-      setVerificationData({
-        id_type: 'NIN National Identity Number',
-        id_number: 'NIN-7823901293',
-        business_name: 'Port Harcourt Tech & Mobile Store',
-        business_address: 'Plot 14, GRA Phase 2, Port Harcourt',
-        product_category: 'Smartphones & Laptops',
-        physical_verification_consent: true,
-        submitted_at: new Date().toISOString(),
-      });
-      return;
-    }
-
-    // For other seller users, check localStorage
-    const stored = localStorage.getItem(`${STORAGE_PREFIX}${user.id}`);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setStatus(parsed.status || 'PENDING');
-        setVerificationData(parsed.data || null);
-      } catch {
-        setStatus('NOT_STARTED');
-      }
-    } else {
-      setStatus(user.role === 'seller' ? 'PENDING' : 'NOT_STARTED');
     }
   }, [user]);
 
-  const submitVerification = (data: SellerVerificationData) => {
+  useEffect(() => {
+    refreshVerification();
+  }, [refreshVerification]);
+
+  const submitVerification = async (data: SellerVerificationData) => {
     if (!user) return;
     const now = new Date().toISOString();
     const updatedData = { ...data, submitted_at: now };
-    const newStatus: VerificationStatus = 'VERIFIED';
 
+    const res = await submitVerificationApi({
+      store_name: data.business_name,
+      store_address: data.business_address,
+      id_type: data.id_type,
+      id_number: data.id_number,
+    });
+
+    const newStatus = (res.verification_status as VerificationStatus) || 'UNDER_REVIEW';
     setVerificationData(updatedData);
     setStatus(newStatus);
 
@@ -92,18 +107,6 @@ export const SellerVerificationProvider: React.FC<{ children: React.ReactNode }>
       JSON.stringify({
         status: newStatus,
         data: updatedData,
-      })
-    );
-  };
-
-  const setVerificationStatus = (newStatus: VerificationStatus) => {
-    if (!user) return;
-    setStatus(newStatus);
-    localStorage.setItem(
-      `${STORAGE_PREFIX}${user.id}`,
-      JSON.stringify({
-        status: newStatus,
-        data: verificationData,
       })
     );
   };
@@ -121,7 +124,7 @@ export const SellerVerificationProvider: React.FC<{ children: React.ReactNode }>
         status,
         verificationData,
         submitVerification,
-        setVerificationStatus,
+        refreshVerification,
         resetVerification,
       }}
     >
@@ -130,6 +133,7 @@ export const SellerVerificationProvider: React.FC<{ children: React.ReactNode }>
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSellerVerification = (): SellerVerificationContextType => {
   const context = useContext(SellerVerificationContext);
   if (!context) {

@@ -10,6 +10,8 @@ export interface User {
 }
 
 export type ProductVerificationStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
+export type ProductAuthenticityStatus = 'UNINSPECTED' | 'VERIFIED' | 'REJECTED' | string;
+export type AfricanMadeCategory = 'ELECTRONICS' | 'HOME_APPLIANCES' | 'FURNITURE' | string;
 
 export interface Product {
   id: string;
@@ -20,6 +22,13 @@ export interface Product {
   condition: string;
   stock: number;
   verification_status: ProductVerificationStatus;
+  status?: ProductVerificationStatus;
+  authenticity_status: ProductAuthenticityStatus;
+  last_inspected_at?: string | null;
+  is_african_made: boolean;
+  african_made_category?: AfricanMadeCategory | null;
+  warranty_months: number;
+  warranty_terms?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -47,6 +56,11 @@ export interface Order {
   status: OrderStatus;
   payment_status: PaymentStatus;
   delivery_status: DeliveryStatus;
+  escrow_id?: number | null;
+  blockchain_tx_hash?: string | null;
+  funding_tx_hash?: string | null;
+  release_tx_hash?: string | null;
+  refund_tx_hash?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -59,6 +73,117 @@ export interface PickupInspection {
   notes?: string | null;
   inspection_status: 'PENDING' | 'PASSED' | 'FAILED';
   created_at: string;
+}
+
+export type SellerTrustLevel = 'LV1' | 'LV2' | 'LV3' | 'LV4' | 'LV5' | string;
+export type SellerGrade = 'Grade C' | 'Grade B' | 'Grade A' | string;
+
+export interface SellerProfile {
+  id?: string;
+  seller_id?: string;
+  user_id: string;
+  store_name?: string | null;
+  store_address?: string | null;
+  trust_level: SellerTrustLevel;
+  seller_grade: SellerGrade;
+  successful_transactions: number;
+  fulfillment_rate: number;
+  verification_status: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface SellerVerificationStatusResponse {
+  seller_id: string;
+  verification_status: string;
+  store_name?: string | null;
+  store_address?: string | null;
+  kyc_completed: boolean;
+  store_verified: boolean;
+  physical_inspection_passed: boolean;
+}
+
+export interface InspectionReport {
+  id: string;
+  product_id: string;
+  order_id?: string | null;
+  inspector_id?: string | null;
+  authenticity_verified: boolean;
+  physical_condition: string;
+  serial_number?: string | null;
+  functional_tests?: Record<string, unknown> | null;
+  photos_json?: Record<string, unknown> | null;
+  notes?: string | null;
+  created_at: string;
+}
+
+export interface ProductVerificationSummary {
+  product_id: string;
+  product_name: string;
+  verification_status: string;
+  authenticity_status: string;
+  last_inspected_at?: string | null;
+  physical_condition: string;
+  seller_id: string;
+  seller_trust_level?: string | null;
+  seller_grade?: string | null;
+  has_inspection_report: boolean;
+}
+
+export interface TrustHistory {
+  id: string;
+  seller_id: string;
+  old_level: string;
+  new_level: string;
+  reason: string;
+  trigger_transaction_id?: string | null;
+  created_at: string;
+}
+
+export interface Wishlist {
+  id: string;
+  user_id?: string;
+  buyer_id?: string;
+  product_id: string;
+  product?: Product | null;
+  created_at: string;
+}
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  notification_type: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface SubscriptionEntitlements {
+  max_active_listings?: number | null;
+  advanced_analytics_enabled: boolean;
+  business_insights_enabled: boolean;
+  priority_verification_enabled: boolean;
+}
+
+export interface Subscription {
+  id: string;
+  seller_id: string;
+  plan_tier: string;
+  status: string;
+  expires_at?: string | null;
+  entitlements?: SubscriptionEntitlements;
+  created_at: string;
+}
+
+export interface FundOrderRequest {
+  tx_hash?: string | null;
+  signed_tx_xdr?: string | null;
+}
+
+export interface ConfirmDeliveryRequest {
+  tx_hash?: string | null;
+  signed_tx_xdr?: string | null;
 }
 
 export interface ApiResponse<T> {
@@ -107,4 +232,5 @@ export interface VisualSearchResponse {
   query?: VisualSearchQueryInfo;
   matches: VisualSearchMatchItem[];
 }
+
 

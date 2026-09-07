@@ -43,23 +43,39 @@ export const SellerVerificationPage: React.FC = () => {
     setCurrentStep((prev) => Math.max(2, prev - 1));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!physicalConsent) {
       setError('Please acknowledge physical verification to submit your seller application.');
       return;
     }
 
-    submitVerification({
-      id_type: idType,
-      id_number: idNumber.trim() || 'NIN-1092837192',
-      business_name: businessName.trim() || 'Port Harcourt Tech & Logistics Store',
-      business_address: businessAddress.trim() || 'GRA Phase 2, Port Harcourt',
-      product_category: productCategory,
-      physical_verification_consent: physicalConsent,
-    });
+    if (!businessName.trim() || !businessAddress.trim()) {
+      setError('Store name and address are required for verification.');
+      return;
+    }
 
-    navigate('/seller');
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      await submitVerification({
+        id_type: idType,
+        id_number: idNumber.trim() || 'NIN-1092837192',
+        business_name: businessName.trim(),
+        business_address: businessAddress.trim(),
+        product_category: productCategory,
+        physical_verification_consent: physicalConsent,
+      });
+
+      navigate('/seller/verification/status');
+    } catch (err) {
+      setError((err as Error).message || 'Failed to submit verification application. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const stepsList = [
@@ -468,8 +484,8 @@ export const SellerVerificationPage: React.FC = () => {
                   <button type="button" onClick={handlePrev} className="btn btn-dark">
                     <ArrowLeft size={18} /> Back
                   </button>
-                  <button type="submit" className="btn btn-orange" style={{ padding: '12px 28px' }}>
-                    Submit Verification Info <ArrowRight size={18} />
+                  <button type="submit" className="btn btn-orange" disabled={isSubmitting} style={{ padding: '12px 28px' }}>
+                    {isSubmitting ? 'Submitting Application...' : 'Submit Verification Info'} <ArrowRight size={18} />
                   </button>
                 </div>
               </form>

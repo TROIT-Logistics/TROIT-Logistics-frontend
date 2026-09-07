@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { registerUser } from '@/lib/api/auth';
-import { User, UserRole } from '@/lib/api/types';
+import { UserRole } from '@/lib/api/types';
 import { useAuth } from '@/context/AuthContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -27,14 +27,6 @@ export const RegisterPage: React.FC = () => {
     const cleanEmail = email.trim();
     const cleanName = fullName.trim() || 'New User';
 
-    const fallbackUser: User = {
-      id: `user-demo-${Date.now()}`,
-      email: cleanEmail,
-      full_name: cleanName,
-      role: role,
-      created_at: new Date().toISOString(),
-    };
-
     try {
       const res = await registerUser({
         full_name: cleanName,
@@ -50,20 +42,14 @@ export const RegisterPage: React.FC = () => {
         } else {
           navigate('/buyer');
         }
-        setIsLoading(false);
         return;
       }
-    } catch {
-      // Backend unavailable - fallback to instant presentation signup
+      setError('Registration response did not contain user token.');
+    } catch (err) {
+      setError((err as Error).message || 'Registration failed. Please check your details and try again.');
+    } finally {
+      setIsLoading(false);
     }
-
-    login('token-mvp-' + Date.now(), fallbackUser);
-    if (fallbackUser.role === 'seller') {
-      navigate('/seller/verification');
-    } else {
-      navigate('/buyer');
-    }
-    setIsLoading(false);
   };
 
   return (
