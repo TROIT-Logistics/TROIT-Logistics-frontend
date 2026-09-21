@@ -18,7 +18,6 @@ import {
   Lock,
   FileText,
   Award,
-  Store,
   Info,
   X,
 } from 'lucide-react';
@@ -364,7 +363,7 @@ export const ProductDetailsPage: React.FC = () => {
                   )}
                 </div>
 
-                {/* Seller Trust Card Section */}
+                {/* TROIT Verification & Supplier Trust Section */}
                 <div
                   style={{
                     backgroundColor: 'rgba(255, 107, 0, 0.05)',
@@ -383,29 +382,17 @@ export const ProductDetailsPage: React.FC = () => {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Store size={20} style={{ color: 'var(--color-orange-primary)' }} />
-                      <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>
-                        {sellerProfile?.store_name || `Seller ${product.seller_id.slice(0, 8)}`}
+                      <ShieldCheck size={20} style={{ color: 'var(--color-orange-primary)' }} />
+                      <span style={{ fontWeight: 800, fontSize: '0.95rem' }}>
+                        TROIT Verified Supplier & Escrow Protection
                       </span>
                     </div>
-
-                    <Link
-                      to={`/seller/profile/${product.seller_id}`}
-                      style={{
-                        fontSize: '0.8rem',
-                        color: 'var(--color-orange-primary)',
-                        fontWeight: 700,
-                        textDecoration: 'underline',
-                      }}
-                    >
-                      View Seller Profile & History →
-                    </Link>
                   </div>
 
                   <div
                     style={{
                       display: 'grid',
-                      gridTemplateColumns: 'repeat(4, 1fr)',
+                      gridTemplateColumns: 'repeat(3, 1fr)',
                       gap: '12px',
                       textAlign: 'center',
                     }}
@@ -419,7 +406,7 @@ export const ProductDetailsPage: React.FC = () => {
                       }}
                     >
                       <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '2px' }}>
-                        Trust Level
+                        Supplier Trust Level
                       </div>
                       <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--color-orange-primary)' }}>
                         {sellerProfile?.trust_level || verificationSummary?.seller_trust_level || 'LV1'}
@@ -435,7 +422,7 @@ export const ProductDetailsPage: React.FC = () => {
                       }}
                     >
                       <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '2px' }}>
-                        Seller Grade
+                        Supplier Trust Grade
                       </div>
                       <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#10B981' }}>
                         {sellerProfile?.seller_grade || verificationSummary?.seller_grade || 'Grade C'}
@@ -451,26 +438,10 @@ export const ProductDetailsPage: React.FC = () => {
                       }}
                     >
                       <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '2px' }}>
-                        Successful Tx
-                      </div>
-                      <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>
-                        {sellerProfile ? sellerProfile.successful_transactions : 0}
-                      </div>
-                    </div>
-
-                    <div
-                      style={{
-                        backgroundColor: 'var(--color-surface)',
-                        padding: '10px 8px',
-                        borderRadius: '6px',
-                        border: '1px solid var(--color-border-light)',
-                      }}
-                    >
-                      <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '2px' }}>
                         Fulfillment Rate
                       </div>
-                      <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>
-                        {sellerProfile ? `${sellerProfile.fulfillment_rate}%` : '100%'}
+                      <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#3B82F6' }}>
+                        {sellerProfile?.fulfillment_rate || 100}%
                       </div>
                     </div>
                   </div>

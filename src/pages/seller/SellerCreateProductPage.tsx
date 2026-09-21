@@ -23,6 +23,11 @@ export const SellerCreateProductPage: React.FC = () => {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [customUrlInput, setCustomUrlInput] = useState('');
 
+  const [isAfricanMade, setIsAfricanMade] = useState(false);
+  const [africanMadeCategory, setAfricanMadeCategory] = useState('ELECTRONICS');
+  const [warrantyMonths, setWarrantyMonths] = useState('0');
+  const [warrantyTerms, setWarrantyTerms] = useState('');
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -65,6 +70,7 @@ export const SellerCreateProductPage: React.FC = () => {
 
     const priceNum = parseFloat(price);
     const stockNum = parseInt(stock, 10);
+    const warrantyNum = parseInt(warrantyMonths, 10) || 0;
 
     if (!name.trim()) {
       setError('Product name cannot be empty');
@@ -79,6 +85,11 @@ export const SellerCreateProductPage: React.FC = () => {
       return;
     }
 
+    if (isAfricanMade && !africanMadeCategory) {
+      setError('Please select an African Made category');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -88,6 +99,10 @@ export const SellerCreateProductPage: React.FC = () => {
         price: priceNum,
         condition,
         stock: stockNum,
+        is_african_made: isAfricanMade,
+        african_made_category: isAfricanMade ? africanMadeCategory : undefined,
+        warranty_months: warrantyNum,
+        warranty_terms: warrantyTerms.trim() || undefined,
       });
 
       navigate('/seller');
@@ -446,7 +461,7 @@ export const SellerCreateProductPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div style={{ marginBottom: '24px' }}>
+                <div style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>
                     Item Condition Grade
                   </label>
@@ -468,6 +483,97 @@ export const SellerCreateProductPage: React.FC = () => {
                     <option value="Grade B - Excellent">Grade B - Excellent</option>
                     <option value="Grade C - Good Working Order">Grade C - Good Working Order</option>
                   </select>
+                </div>
+
+                {/* Made in Africa Specification */}
+                <div
+                  style={{
+                    backgroundColor: 'var(--color-surface-card)',
+                    border: '1px solid var(--color-border-light)',
+                    borderRadius: '8px',
+                    padding: '16px',
+                    marginBottom: '20px',
+                  }}
+                >
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={isAfricanMade}
+                      onChange={(e) => setIsAfricanMade(e.target.checked)}
+                      style={{ width: '18px', height: '18px', accentColor: 'var(--color-orange-primary)' }}
+                    />
+                    🌍 Made in Africa Product Certification
+                  </label>
+
+                  {isAfricanMade && (
+                    <div style={{ marginTop: '14px' }}>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px' }}>
+                        African-Made Category
+                      </label>
+                      <select
+                        value={africanMadeCategory}
+                        onChange={(e) => setAfricanMadeCategory(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          border: '1px solid var(--color-border-light)',
+                          backgroundColor: 'var(--color-bg-page)',
+                          color: 'var(--color-text-main)',
+                          fontSize: '0.85rem',
+                        }}
+                      >
+                        <option value="ELECTRONICS">ELECTRONICS</option>
+                        <option value="HOME_APPLIANCES">HOME_APPLIANCES</option>
+                        <option value="FURNITURE">FURNITURE</option>
+                      </select>
+                    </div>
+                  )}
+                </div>
+
+                {/* Warranty Information */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }} className="grid-2col-responsive">
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>
+                      Warranty Duration (Months)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={warrantyMonths}
+                      onChange={(e) => setWarrantyMonths(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--color-border-light)',
+                        backgroundColor: 'var(--color-bg-page)',
+                        color: 'var(--color-text-main)',
+                        fontSize: '0.9rem',
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>
+                      Warranty Terms (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 6 Months repair coverage"
+                      value={warrantyTerms}
+                      onChange={(e) => setWarrantyTerms(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--color-border-light)',
+                        backgroundColor: 'var(--color-bg-page)',
+                        color: 'var(--color-text-main)',
+                        fontSize: '0.9rem',
+                      }}
+                    />
+                  </div>
                 </div>
 
                 <button
