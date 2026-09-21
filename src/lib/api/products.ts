@@ -34,6 +34,17 @@ export const createProduct = async (payload: CreateProductPayload): Promise<Prod
   return res.data.data;
 };
 
+export const fetchAllProducts = async (): Promise<Product[]> => {
+  const [pending, verified, rejected] = await Promise.all([
+    fetchProducts('PENDING').catch(() => []),
+    fetchProducts('VERIFIED').catch(() => []),
+    fetchProducts('REJECTED').catch(() => []),
+  ]);
+  const productMap = new Map<string, Product>();
+  [...pending, ...verified, ...rejected].forEach((p) => productMap.set(p.id, p));
+  return Array.from(productMap.values());
+};
+
 export const verifyProduct = async (
   id: string,
   verification_status: ProductVerificationStatus = 'VERIFIED'

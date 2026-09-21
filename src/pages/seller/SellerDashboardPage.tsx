@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchProducts } from '@/lib/api/products';
+import { fetchAllProducts } from '@/lib/api/products';
 import { fetchOrders } from '@/lib/api/orders';
 import {
   fetchCurrentSellerProfile,
@@ -10,6 +10,7 @@ import {
 } from '@/lib/api/seller';
 import { Product, Order, SellerProfile, SellerVerificationStatusResponse, Subscription, TrustHistory } from '@/lib/api/types';
 import { getProductImage } from '@/lib/utils/productImages';
+import { useAuth } from '@/context/AuthContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import {
@@ -23,16 +24,21 @@ import {
   Info,
   History,
   Calendar,
+  Eye,
+  Edit3,
+  RefreshCw,
+  PackageX,
 } from 'lucide-react';
 
 export const SellerDashboardPage: React.FC = () => {
-
+  const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [sellerProfile, setSellerProfile] = useState<SellerProfile | null>(null);
   const [verificationState, setVerificationState] = useState<SellerVerificationStatusResponse | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [trustHistory, setTrustHistory] = useState<TrustHistory[]>([]);
+  const [activeTab, setActiveTab] = useState<'ALL' | 'VERIFIED' | 'PENDING' | 'REJECTED'>('ALL');
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,10 +47,9 @@ export const SellerDashboardPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const [pendingProds, verifiedProds, userOrders, profileData, verificationData, subData, historyData] =
+      const [allProds, userOrders, profileData, verificationData, subData, historyData] =
         await Promise.all([
-          fetchProducts('PENDING').catch(() => []),
-          fetchProducts('VERIFIED').catch(() => []),
+          fetchAllProducts().catch(() => []),
           fetchOrders().catch(() => []),
           fetchCurrentSellerProfile().catch(() => null),
           fetchSellerVerification().catch(() => null),
@@ -52,7 +57,7 @@ export const SellerDashboardPage: React.FC = () => {
           fetchTrustHistory().catch(() => []),
         ]);
 
-      setProducts([...pendingProds, ...verifiedProds]);
+      setProducts(allProds);
       setOrders(userOrders);
       setSellerProfile(profileData);
       setVerificationState(verificationData);
@@ -69,14 +74,25 @@ export const SellerDashboardPage: React.FC = () => {
     loadData();
   }, []);
 
+  // Filter products strictly belonging to authenticated seller
+  const sellerProducts = products.filter(
+    (p) => p.seller_id === user?.id || (user?.email === 'seller@demo.troit' && p.seller_id === 'c8f58e47-9f9e-4451-a59b-ebd107d28339')
+  );
+
+  const displayedProducts = sellerProducts.filter((p) => {
+    if (activeTab === 'ALL') return true;
+    return p.verification_status === activeTab;
+  });
+
   // Sales & Earnings calculated strictly from real completed orders
   const completedOrders = orders.filter((o) => o.status === 'COMPLETED');
   const totalProductsSold = completedOrders.reduce((sum, o) => sum + o.quantity, 0);
   const releasedEarnings = completedOrders.reduce((sum, o) => sum + o.amount, 0);
 
   // Inspection inventory breakdown
-  const verifiedInventoryCount = products.filter((p) => p.verification_status === 'VERIFIED').length;
-  const awaitingInspectionCount = products.filter((p) => p.verification_status === 'PENDING').length;
+  const verifiedInventoryCount = sellerProducts.filter((p) => p.verification_status === 'VERIFIED').length;
+  const awaitingInspectionCount = sellerProducts.filter((p) => p.verification_status === 'PENDING').length;
+  const rejectedInventoryCount = sellerProducts.filter((p) => p.verification_status === 'REJECTED').length;
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -381,7 +397,7 @@ export const SellerDashboardPage: React.FC = () => {
               )}
             </div>
 
-            {/* Listed Products Catalogue */}
+            {/* Listed Products Catalogue & Inventory */}
             <div
               style={{
                 backgroundColor: 'var(--color-surface)',
@@ -391,17 +407,88 @@ export const SellerDashboardPage: React.FC = () => {
                 boxShadow: 'var(--shadow-sm)',
               }}
             >
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '20px' }}>
-                Store Inventory & Verification State ({products.length})
-              </h2>
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '16px',
+                  marginBottom: '20px',
+                }}
+              >
+                <div>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>
+                    Store Inventory & Verification ({displayedProducts.length})
+                  </h2>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                    Authenticated seller items & physical verification states
+                  </div>
+                </div>
 
-              {products.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '40px', color: 'var(--color-text-muted)' }}>
-                  No products listed yet. Click "Add New Product" to list an item for field inspection.
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('ALL')}
+                    className={activeTab === 'ALL' ? 'btn btn-orange' : 'btn btn-dark'}
+                    style={{ fontSize: '0.75rem', padding: '6px 12px' }}
+                  >
+                    All ({sellerProducts.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('VERIFIED')}
+                    className={activeTab === 'VERIFIED' ? 'btn btn-orange' : 'btn btn-dark'}
+                    style={{ fontSize: '0.75rem', padding: '6px 12px' }}
+                  >
+                    Verified ({verifiedInventoryCount})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('PENDING')}
+                    className={activeTab === 'PENDING' ? 'btn btn-orange' : 'btn btn-dark'}
+                    style={{ fontSize: '0.75rem', padding: '6px 12px' }}
+                  >
+                    Pending Review ({awaitingInspectionCount})
+                  </button>
+                  {rejectedInventoryCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('REJECTED')}
+                      className={activeTab === 'REJECTED' ? 'btn btn-orange' : 'btn btn-dark'}
+                      style={{ fontSize: '0.75rem', padding: '6px 12px' }}
+                    >
+                      Rejected ({rejectedInventoryCount})
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {displayedProducts.length === 0 ? (
+                <div
+                  style={{
+                    textAlign: 'center',
+                    padding: '48px 20px',
+                    backgroundColor: 'var(--color-surface-card)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px dashed var(--color-border-light)',
+                    color: 'var(--color-text-muted)',
+                  }}
+                >
+                  <PackageX size={44} style={{ margin: '0 auto 12px', opacity: 0.5, color: 'var(--color-orange-primary)' }} />
+                  <h4 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '6px', color: 'var(--color-text-main)' }}>
+                    {sellerProducts.length === 0 ? 'No products in your inventory yet.' : 'No products found in this category.'}
+                  </h4>
+                  <p style={{ fontSize: '0.85rem', marginBottom: '20px', maxWidth: '420px', margin: '0 auto 20px' }}>
+                    List your product for TROIT field agent inspection and verification to make it available to verified buyers.
+                  </p>
+                  <Link to="/seller/products/new" className="btn btn-orange" style={{ fontSize: '0.85rem', display: 'inline-flex' }}>
+                    <Plus size={16} /> Add Product
+                  </Link>
                 </div>
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
-                  {products.map((prod) => {
+                  {displayedProducts.map((prod) => {
                     const prodImg = getProductImage(prod.name);
 
                     return (
@@ -425,29 +512,85 @@ export const SellerDashboardPage: React.FC = () => {
                               top: '8px',
                               right: '8px',
                               fontSize: '0.7rem',
-                              fontWeight: 700,
-                              padding: '3px 8px',
+                              fontWeight: 800,
+                              padding: '4px 10px',
                               borderRadius: 'var(--radius-pill)',
                               backgroundColor:
                                 prod.verification_status === 'VERIFIED'
                                   ? 'rgba(16, 185, 129, 0.95)'
-                                  : 'rgba(245, 184, 66, 0.95)',
+                                  : prod.verification_status === 'REJECTED'
+                                  ? 'rgba(239, 68, 68, 0.95)'
+                                  : 'rgba(245, 158, 11, 0.95)',
                               color: '#FFFFFF',
                             }}
                           >
                             {prod.verification_status}
                           </span>
+
+                          {prod.is_african_made && (
+                            <span
+                              style={{
+                                position: 'absolute',
+                                top: '8px',
+                                left: '8px',
+                                fontSize: '0.65rem',
+                                fontWeight: 800,
+                                padding: '3px 8px',
+                                borderRadius: 'var(--radius-pill)',
+                                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                                color: '#10B981',
+                                border: '1px solid #10B981',
+                              }}
+                            >
+                              🌍 Made in Africa
+                            </span>
+                          )}
                         </div>
 
                         <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                           <div>
-                            <h4 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '6px' }}>{prod.name}</h4>
-                            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-orange-primary)', marginBottom: '12px' }}>
+                            <h4 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '6px' }}>{prod.name}</h4>
+                            <div style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--color-orange-primary)', marginBottom: '8px' }}>
                               ₦{prod.price.toLocaleString()}
                             </div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '10px' }}>
-                              Physical Condition: {prod.condition} | Stock: {prod.stock}
+                            <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginBottom: '6px' }}>
+                              Condition: <strong>{prod.condition}</strong> | Stock: <strong>{prod.stock}</strong>
                             </div>
+                            {prod.warranty_months > 0 && (
+                              <div style={{ fontSize: '0.75rem', color: '#3B82F6', fontWeight: 700, marginBottom: '10px' }}>
+                                Warranty: {prod.warranty_months} Months
+                              </div>
+                            )}
+                          </div>
+
+                          <div style={{ paddingTop: '12px', borderTop: '1px solid var(--color-border-light)', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                            <Link
+                              to={`/buyer/products/${prod.id}`}
+                              className="btn btn-dark"
+                              style={{ fontSize: '0.75rem', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                            >
+                              <Eye size={13} /> View
+                            </Link>
+
+                            <button
+                              type="button"
+                              className="btn btn-dark"
+                              title="Product edit endpoint (PUT /api/v1/products/:id) is pending backend support"
+                              disabled
+                              style={{ opacity: 0.5, cursor: 'not-allowed', fontSize: '0.75rem', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                            >
+                              <Edit3 size={13} /> Edit
+                            </button>
+
+                            <button
+                              type="button"
+                              className="btn btn-dark"
+                              title="Stock update endpoint (PATCH /api/v1/products/:id/stock) is pending backend support"
+                              disabled
+                              style={{ opacity: 0.5, cursor: 'not-allowed', fontSize: '0.75rem', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                            >
+                              <RefreshCw size={13} /> Stock
+                            </button>
                           </div>
                         </div>
                       </div>
