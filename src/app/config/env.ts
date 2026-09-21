@@ -11,10 +11,12 @@ export interface AppEnvConfig {
 }
 
 const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-// Ensure apiBaseUrl ends with /v1
-const normalizedApiBaseUrl = rawBaseUrl.endsWith('/v1') 
-  ? rawBaseUrl 
-  : `${rawBaseUrl.replace(/\/$/, '')}/v1`;
+const cleanUrl = rawBaseUrl.replace(/\/$/, '');
+const normalizedApiBaseUrl = cleanUrl.endsWith('/api/v1')
+  ? cleanUrl
+  : cleanUrl.endsWith('/api')
+  ? `${cleanUrl}/v1`
+  : `${cleanUrl}/api/v1`;
 
 export const envConfig: AppEnvConfig = {
   apiBaseUrl: normalizedApiBaseUrl,
