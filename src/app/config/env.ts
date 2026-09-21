@@ -10,7 +10,7 @@ export interface AppEnvConfig {
   isProd: boolean;
 }
 
-const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://troit-logistics-backend-pqnk.onrender.com';
 const cleanUrl = rawBaseUrl.replace(/\/$/, '');
 const normalizedApiBaseUrl = cleanUrl.endsWith('/api/v1')
   ? cleanUrl
