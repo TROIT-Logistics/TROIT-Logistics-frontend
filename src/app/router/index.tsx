@@ -14,6 +14,19 @@ import SellerProfilePage from '@/pages/seller/SellerProfilePage';
 import SellerCreateProductPage from '@/pages/seller/SellerCreateProductPage';
 import SellerVerificationPage from '@/pages/seller/SellerVerificationPage';
 import SellerVerificationStatusPage from '@/pages/seller/SellerVerificationStatusPage';
+
+// Admin Pages
+import { AdminOverviewPage } from '@/pages/admin/AdminOverviewPage';
+import { AdminProductsPage } from '@/pages/admin/AdminProductsPage';
+import { AdminSellersPage } from '@/pages/admin/AdminSellersPage';
+import { AdminOrdersPage } from '@/pages/admin/AdminOrdersPage';
+import { AdminInspectionsPage } from '@/pages/admin/AdminInspectionsPage';
+import { AdminTrustPage } from '@/pages/admin/AdminTrustPage';
+import { AdminDisputesPage } from '@/pages/admin/AdminDisputesPage';
+import { AdminUsersPage } from '@/pages/admin/AdminUsersPage';
+import { AdminAnalyticsPage } from '@/pages/admin/AdminAnalyticsPage';
+import { AdminSettingsPage } from '@/pages/admin/AdminSettingsPage';
+
 import { useAuth } from '@/context/AuthContext';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRole?: string }> = ({
@@ -35,6 +48,28 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRole?: string
   }
 
   if (allowedRole && user?.role !== allowedRole && user?.role !== 'admin') {
+    return <Navigate to={user?.role === 'seller' ? '/seller' : '/buyer'} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const AdminProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, isLoading, user } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', color: 'var(--color-text-muted)' }}>
+        Verifying administrator credentials...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user?.role !== 'admin') {
     return <Navigate to={user?.role === 'seller' ? '/seller' : '/buyer'} replace />;
   }
 
@@ -108,11 +143,93 @@ export const AppRouter: React.FC = () => {
         }
       />
 
+      {/* Admin Dashboard Operations Center */}
+      <Route path="/admin" element={<Navigate to="/admin/overview" replace />} />
+      <Route
+        path="/admin/overview"
+        element={
+          <AdminProtectedRoute>
+            <AdminOverviewPage />
+          </AdminProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/products"
+        element={
+          <AdminProtectedRoute>
+            <AdminProductsPage />
+          </AdminProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/sellers"
+        element={
+          <AdminProtectedRoute>
+            <AdminSellersPage />
+          </AdminProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/orders"
+        element={
+          <AdminProtectedRoute>
+            <AdminOrdersPage />
+          </AdminProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/inspections"
+        element={
+          <AdminProtectedRoute>
+            <AdminInspectionsPage />
+          </AdminProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/trust"
+        element={
+          <AdminProtectedRoute>
+            <AdminTrustPage />
+          </AdminProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/disputes"
+        element={
+          <AdminProtectedRoute>
+            <AdminDisputesPage />
+          </AdminProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <AdminProtectedRoute>
+            <AdminUsersPage />
+          </AdminProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/analytics"
+        element={
+          <AdminProtectedRoute>
+            <AdminAnalyticsPage />
+          </AdminProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/settings"
+        element={
+          <AdminProtectedRoute>
+            <AdminSettingsPage />
+          </AdminProtectedRoute>
+        }
+      />
+
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
-
 
 export default AppRouter;

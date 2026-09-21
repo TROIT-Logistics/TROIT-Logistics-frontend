@@ -233,4 +233,65 @@ export interface VisualSearchResponse {
   matches: VisualSearchMatchItem[];
 }
 
+export interface AdminSellerItem {
+  seller_id: string;
+  user_id: string;
+  store_name?: string | null;
+  store_address?: string | null;
+  trust_level: string;
+  seller_grade: string;
+  successful_transactions: number;
+  fulfillment_rate: number;
+  verification_status: string;
+  user_full_name: string;
+  user_email: string;
+  user_phone?: string | null;
+  total_products: number;
+  total_orders: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AdminSellerListResponse {
+  items: AdminSellerItem[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+}
+
+export interface AdminSellerQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  verification_status?: string;
+}
+
+export interface AdminUserItem {
+  id: string;
+  email: string;
+  full_name: string;
+  phone_number?: string | null;
+  role: UserRole;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AdminUserListResponse {
+  items: AdminUserItem[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+}
+
+export interface AdminUserQueryParams {
+  page?: number;
+  limit?: number;
+  role?: UserRole;
+  search?: string;
+}
+
+
 
