@@ -180,8 +180,8 @@ export const AdminOrdersPage: React.FC = () => {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '1rem',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                gap: '0.875rem',
                 backgroundColor: 'var(--color-surface-card)',
                 padding: '1rem',
                 borderRadius: 'var(--radius-sm)',
@@ -211,11 +211,11 @@ export const AdminOrdersPage: React.FC = () => {
                 Counterparty Identity (Admin Internal)
               </h4>
               <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                <div>Buyer UUID: <code style={{ color: 'var(--color-text-main)' }}>{selectedOrder.buyer_id}</code></div>
-                <div>Seller UUID: <code style={{ color: 'var(--color-text-main)' }}>{selectedOrder.seller_id}</code></div>
-                <div>Product UUID: <code style={{ color: 'var(--color-text-main)' }}>{selectedOrder.product_id}</code></div>
+                <div style={{ wordBreak: 'break-all' }}>Buyer UUID: <code style={{ color: 'var(--color-text-main)' }}>{selectedOrder.buyer_id}</code></div>
+                <div style={{ wordBreak: 'break-all' }}>Seller UUID: <code style={{ color: 'var(--color-text-main)' }}>{selectedOrder.seller_id}</code></div>
+                <div style={{ wordBreak: 'break-all' }}>Product UUID: <code style={{ color: 'var(--color-text-main)' }}>{selectedOrder.product_id}</code></div>
                 {selectedOrder.blockchain_tx_hash && (
-                  <div>Blockchain Tx: <code style={{ fontSize: '0.75rem' }}>{selectedOrder.blockchain_tx_hash}</code></div>
+                  <div style={{ wordBreak: 'break-all' }}>Blockchain Tx: <code style={{ fontSize: '0.75rem' }}>{selectedOrder.blockchain_tx_hash}</code></div>
                 )}
               </div>
             </div>
@@ -225,13 +225,15 @@ export const AdminOrdersPage: React.FC = () => {
               <h4 style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.5rem' }}>
                 Admin Order Status Override
               </h4>
-              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value as OrderStatus)}
                   style={{
                     flex: 1,
+                    minWidth: '160px',
                     padding: '0.5rem',
+                    minHeight: '40px',
                     borderRadius: 'var(--radius-sm)',
                     border: '1px solid var(--color-border-light)',
                     backgroundColor: 'var(--color-surface-card)',
@@ -250,6 +252,7 @@ export const AdminOrdersPage: React.FC = () => {
                   disabled={isUpdating || newStatus === selectedOrder.status}
                   style={{
                     padding: '0.5rem 1rem',
+                    minHeight: '40px',
                     borderRadius: 'var(--radius-sm)',
                     border: 'none',
                     backgroundColor: 'var(--color-orange-primary)',
@@ -278,6 +281,7 @@ export const AdminOrdersPage: React.FC = () => {
                   disabled={isUpdating}
                   style={{
                     padding: '0.5rem 1rem',
+                    minHeight: '40px',
                     borderRadius: 'var(--radius-sm)',
                     border: 'none',
                     backgroundColor: '#DC2626',

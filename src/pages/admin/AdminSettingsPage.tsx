@@ -28,27 +28,28 @@ export const AdminSettingsPage: React.FC = () => {
 
   return (
     <AdminLayout title="Operations & System Settings" subtitle="Infrastructure environment parameters and API connection status">
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '800px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '800px', width: '100%' }}>
         {/* Connection Diagnostics Card */}
         <div
           style={{
             backgroundColor: 'var(--color-surface)',
             border: '1px solid var(--color-border-light)',
             borderRadius: 'var(--radius-md)',
-            padding: '1.5rem',
+            padding: '1.25rem',
             boxShadow: 'var(--shadow-sm)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Server size={20} color="var(--color-orange-primary)" /> Backend Infrastructure Health
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Server size={20} color="var(--color-orange-primary)" style={{ flexShrink: 0 }} /> Backend Infrastructure Health
             </h3>
 
             <button
               onClick={verifyBackend}
               disabled={loading}
               style={{
-                padding: '0.375rem 0.75rem',
+                padding: '0.4375rem 0.875rem',
+                minHeight: '40px',
                 borderRadius: 'var(--radius-sm)',
                 border: '1px solid var(--color-border-light)',
                 backgroundColor: 'var(--color-surface-card)',
@@ -68,7 +69,7 @@ export const AdminSettingsPage: React.FC = () => {
           <div
             style={{
               backgroundColor: 'var(--color-surface-card)',
-              padding: '1.25rem',
+              padding: '1rem',
               borderRadius: 'var(--radius-sm)',
               display: 'flex',
               flexDirection: 'column',
@@ -78,7 +79,7 @@ export const AdminSettingsPage: React.FC = () => {
           >
             <div>
               <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'block' }}>API Base URL</span>
-              <code style={{ fontSize: '0.875rem', fontFamily: 'monospace', fontWeight: 700 }}>
+              <code style={{ fontSize: '0.84rem', fontFamily: 'monospace', fontWeight: 700, wordBreak: 'break-all' }}>
                 {envConfig.apiBaseUrl}
               </code>
             </div>
@@ -88,10 +89,10 @@ export const AdminSettingsPage: React.FC = () => {
               {loading ? (
                 <span>Testing connection...</span>
               ) : error ? (
-                <span style={{ color: '#DC2626', fontWeight: 700 }}>{error}</span>
+                <span style={{ color: '#DC2626', fontWeight: 700, wordBreak: 'break-word' }}>{error}</span>
               ) : (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#059669', fontWeight: 700 }}>
-                  <CheckCircle2 size={16} /> Service: {health?.service} (v{health?.version}) — STATUS OK
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#059669', fontWeight: 700, flexWrap: 'wrap' }}>
+                  <CheckCircle2 size={16} style={{ flexShrink: 0 }} /> Service: {health?.service} (v{health?.version}) — STATUS OK
                 </div>
               )}
             </div>
@@ -104,12 +105,12 @@ export const AdminSettingsPage: React.FC = () => {
             backgroundColor: 'var(--color-surface)',
             border: '1px solid var(--color-border-light)',
             borderRadius: 'var(--radius-md)',
-            padding: '1.5rem',
+            padding: '1.25rem',
             boxShadow: 'var(--shadow-sm)',
           }}
         >
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--color-text-main)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Shield size={20} color="var(--color-orange-primary)" /> Security & Route Authorization
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-text-main)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Shield size={20} color="var(--color-orange-primary)" style={{ flexShrink: 0 }} /> Security & Route Authorization
           </h3>
           <ul style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.6, paddingLeft: '1.25rem' }}>
             <li>Frontend admin routes (<code style={{ fontSize: '0.75rem' }}>/admin/*</code>) are protected by <code style={{ fontSize: '0.75rem' }}>AdminProtectedRoute</code>, enforcing <code style={{ fontSize: '0.75rem' }}>user.role === 'admin'</code>.</li>

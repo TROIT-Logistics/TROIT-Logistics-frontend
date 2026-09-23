@@ -26,6 +26,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         minHeight: '100vh',
         backgroundColor: 'var(--color-bg-page)',
         color: 'var(--color-text-main)',
+        overflowX: 'hidden',
+        width: '100%',
+        position: 'relative',
       }}
     >
       {/* Sidebar */}
@@ -41,6 +44,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           display: 'flex',
           flexDirection: 'column',
           minWidth: 0,
+          width: '100%',
+          overflowX: 'hidden',
         }}
       >
         <AdminHeader
@@ -52,15 +57,27 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         />
 
         <main
+          className="admin-main-content"
           style={{
             flex: 1,
-            padding: '1.5rem',
+            padding: '1.25rem',
             overflowY: 'auto',
+            overflowX: 'hidden',
+            width: '100%',
+            boxSizing: 'border-box',
           }}
         >
           {children}
         </main>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .admin-main-content {
+            padding: 0.875rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

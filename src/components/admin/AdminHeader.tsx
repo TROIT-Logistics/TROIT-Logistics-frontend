@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { Logo } from '@/components/ui/Logo';
 import { Menu, Sun, Moon, Bell, LogOut, ShieldCheck, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -33,51 +34,80 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       style={{
         backgroundColor: 'var(--color-surface)',
         borderBottom: '1px solid var(--color-border-light)',
-        padding: '1rem 1.5rem',
+        padding: '0.875rem 1.25rem',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '1rem',
+        gap: '0.75rem',
         position: 'sticky',
         top: 0,
         zIndex: 10,
       }}
     >
-      {/* Left side: Hamburger & Title */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      {/* Left side: Hamburger, Logo on Mobile, Page Title */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
         <button
           onClick={onOpenMobileSidebar}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '0.5rem',
+            minWidth: '42px',
+            minHeight: '42px',
+            padding: '0.4rem',
             background: 'none',
             border: '1px solid var(--color-border-light)',
             borderRadius: 'var(--radius-sm)',
             color: 'var(--color-text-main)',
             cursor: 'pointer',
+            flexShrink: 0,
           }}
           className="admin-mobile-menu-btn"
           aria-label="Open Navigation Menu"
         >
-          <Menu size={20} />
+          <Menu size={22} />
         </button>
 
-        <div>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0 }}>
+        {/* Mobile Header Logo */}
+        <div className="admin-mobile-header-logo">
+          <Logo variant="admin" size="sm" to="/admin/overview" />
+        </div>
+
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <h1
+            style={{
+              fontSize: '1.125rem',
+              fontWeight: 800,
+              color: 'var(--color-text-main)',
+              margin: 0,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              lineHeight: 1.2,
+            }}
+          >
             {title}
           </h1>
           {subtitle && (
-            <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', margin: 0 }}>
+            <p
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--color-text-muted)',
+                margin: 0,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+              className="admin-header-subtitle"
+            >
               {subtitle}
             </p>
           )}
         </div>
       </div>
 
-      {/* Right side: Search, Theme, Notifications, User Profile */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
+      {/* Right side: Search, Theme Toggle, Notifications, User Identity, Logout */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexShrink: 0 }}>
         {onSearchChange !== undefined && (
           <div style={{ position: 'relative', display: 'none' }} className="admin-header-search">
             <Search
@@ -106,7 +136,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 backgroundColor: 'var(--color-surface-card)',
                 color: 'var(--color-text-main)',
                 outline: 'none',
-                width: '200px',
+                width: '180px',
               }}
             />
           </div>
@@ -116,7 +146,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         <button
           onClick={toggleTheme}
           style={{
-            padding: '0.5rem',
+            minWidth: '40px',
+            minHeight: '40px',
             borderRadius: 'var(--radius-sm)',
             border: '1px solid var(--color-border-light)',
             backgroundColor: 'var(--color-surface)',
@@ -127,6 +158,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             justifyContent: 'center',
           }}
           title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+          aria-label="Toggle color theme"
         >
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
@@ -134,7 +166,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         {/* Notifications Indicator */}
         <button
           style={{
-            padding: '0.5rem',
+            minWidth: '40px',
+            minHeight: '40px',
             borderRadius: 'var(--radius-sm)',
             border: '1px solid var(--color-border-light)',
             backgroundColor: 'var(--color-surface)',
@@ -146,13 +179,14 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             position: 'relative',
           }}
           title="System Notifications"
+          aria-label="System Notifications"
         >
           <Bell size={18} />
           <span
             style={{
               position: 'absolute',
-              top: '4px',
-              right: '4px',
+              top: '6px',
+              right: '6px',
               width: '6px',
               height: '6px',
               borderRadius: '50%',
@@ -161,47 +195,51 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           />
         </button>
 
-        {/* Admin User Menu */}
+        {/* Admin User Identity Pill & Exit */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.625rem',
-            paddingLeft: '0.5rem',
+            gap: '0.5rem',
+            paddingLeft: '0.375rem',
             borderLeft: '1px solid var(--color-border-light)',
           }}
         >
           <div
             style={{
-              width: '2.25rem',
-              height: '2.25rem',
+              width: '2.125rem',
+              height: '2.125rem',
               borderRadius: '50%',
               backgroundColor: 'rgba(255, 77, 0, 0.12)',
               color: 'var(--color-orange-primary)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontWeight: 700,
-              fontSize: '0.875rem',
+              fontWeight: 800,
+              fontSize: '0.84rem',
+              flexShrink: 0,
             }}
+            title={user?.full_name || 'Admin'}
           >
             {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'A'}
           </div>
 
           <div style={{ display: 'none' }} className="admin-user-info">
-            <div style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--color-text-main)', lineHeight: 1.2 }}>
-              {user?.full_name || 'System Admin'}
+            <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--color-text-main)', lineHeight: 1.2 }}>
+              {user?.full_name?.split(' ')[0] || 'Admin'}
             </div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '3px' }}>
-              <ShieldCheck size={12} color="var(--color-orange-primary)" />
-              <span style={{ textTransform: 'uppercase', fontWeight: 600 }}>ADMINISTRATOR</span>
+            <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '2px' }}>
+              <ShieldCheck size={11} color="var(--color-orange-primary)" />
+              <span style={{ textTransform: 'uppercase', fontWeight: 700 }}>ADMIN</span>
             </div>
           </div>
 
           <button
             onClick={handleLogout}
             style={{
-              padding: '0.4375rem 0.625rem',
+              minWidth: '40px',
+              minHeight: '40px',
+              padding: '0.4rem 0.625rem',
               borderRadius: 'var(--radius-sm)',
               border: '1px solid var(--color-border-light)',
               backgroundColor: 'transparent',
@@ -209,11 +247,13 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '0.375rem',
               fontSize: '0.8125rem',
               fontWeight: 600,
             }}
             title="Sign out of Admin Session"
+            aria-label="Sign out"
           >
             <LogOut size={16} />
             <span style={{ display: 'none' }} className="admin-logout-text">Exit</span>
@@ -222,12 +262,20 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       </div>
 
       <style>{`
-        @media (min-width: 768px) {
-          .admin-mobile-menu-btn {
+        .admin-mobile-header-logo {
+          display: block;
+        }
+
+        @media (min-width: 1024px) {
+          .admin-mobile-menu-btn,
+          .admin-mobile-header-logo {
             display: none !important;
           }
           .admin-header-search, .admin-user-info, .admin-logout-text {
             display: flex !important;
+          }
+          .admin-header-subtitle {
+            display: block !important;
           }
         }
       `}</style>

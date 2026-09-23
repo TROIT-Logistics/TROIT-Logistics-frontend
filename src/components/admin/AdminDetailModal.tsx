@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 
 interface AdminDetailModalProps {
@@ -18,6 +18,18 @@ export const AdminDetailModal: React.FC<AdminDetailModalProps> = ({
   children,
   footerActions,
 }) => {
+  // Prevent background body scrolling when modal is active
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
@@ -29,8 +41,10 @@ export const AdminDetailModal: React.FC<AdminDetailModalProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '1.5rem',
+        padding: '0.75rem',
       }}
+      role="dialog"
+      aria-modal="true"
     >
       {/* Backdrop */}
       <div
@@ -38,8 +52,8 @@ export const AdminDetailModal: React.FC<AdminDetailModalProps> = ({
         style={{
           position: 'fixed',
           inset: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.6)',
-          backdropFilter: 'blur(4px)',
+          backgroundColor: 'rgba(0, 0, 0, 0.65)',
+          backdropFilter: 'blur(5px)',
         }}
       />
 
@@ -47,9 +61,9 @@ export const AdminDetailModal: React.FC<AdminDetailModalProps> = ({
       <div
         style={{
           position: 'relative',
-          width: '100%',
+          width: 'calc(100vw - 1.5rem)',
           maxWidth: '640px',
-          maxHeight: '90vh',
+          maxHeight: '88vh',
           backgroundColor: 'var(--color-surface)',
           border: '1px solid var(--color-border-light)',
           borderRadius: 'var(--radius-lg)',
@@ -58,25 +72,27 @@ export const AdminDetailModal: React.FC<AdminDetailModalProps> = ({
           flexDirection: 'column',
           overflow: 'hidden',
           animation: 'fadeIn 0.2s ease',
+          zIndex: 1001,
         }}
       >
         {/* Header */}
         <div
           style={{
-            padding: '1.25rem 1.5rem',
+            padding: '1rem 1.25rem',
             borderBottom: '1px solid var(--color-border-light)',
             display: 'flex',
             alignItems: 'flex-start',
             justifyContent: 'space-between',
-            gap: '1rem',
+            gap: '0.75rem',
+            backgroundColor: 'var(--color-surface-card)',
           }}
         >
-          <div>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0 }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0, wordBreak: 'break-word' }}>
               {title}
             </h3>
             {subtitle && (
-              <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', margin: '0.25rem 0 0 0' }}>
+              <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', margin: '0.25rem 0 0 0', wordBreak: 'break-word' }}>
                 {subtitle}
               </p>
             )}
@@ -89,17 +105,30 @@ export const AdminDetailModal: React.FC<AdminDetailModalProps> = ({
               border: 'none',
               color: 'var(--color-text-muted)',
               cursor: 'pointer',
-              padding: '0.25rem',
+              padding: '0.5rem',
               borderRadius: 'var(--radius-sm)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minWidth: '44px',
+              minHeight: '44px',
+              flexShrink: 0,
             }}
-            aria-label="Close modal"
+            aria-label="Close modal dialog"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Content Body */}
-        <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+        <div
+          style={{
+            padding: '1.25rem',
+            overflowY: 'auto',
+            flex: 1,
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
           {children}
         </div>
 
@@ -107,13 +136,14 @@ export const AdminDetailModal: React.FC<AdminDetailModalProps> = ({
         {footerActions && (
           <div
             style={{
-              padding: '1rem 1.5rem',
+              padding: '0.875rem 1.25rem',
               borderTop: '1px solid var(--color-border-light)',
               backgroundColor: 'var(--color-surface-card)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'flex-end',
-              gap: '0.75rem',
+              gap: '0.625rem',
+              flexWrap: 'wrap',
             }}
           >
             {footerActions}

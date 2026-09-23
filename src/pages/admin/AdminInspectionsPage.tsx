@@ -108,7 +108,8 @@ export const AdminInspectionsPage: React.FC = () => {
             setActionSuccess(null);
           }}
           style={{
-            padding: '0.375rem 0.75rem',
+            padding: '0.5rem 0.875rem',
+            minHeight: '38px',
             borderRadius: 'var(--radius-sm)',
             border: '1px solid var(--color-border-light)',
             backgroundColor: 'var(--color-surface-card)',
@@ -215,6 +216,7 @@ export const AdminInspectionsPage: React.FC = () => {
                 style={{
                   width: '100%',
                   padding: '0.5rem 0.625rem',
+                  minHeight: '40px',
                   borderRadius: 'var(--radius-sm)',
                   border: '1px solid var(--color-border-light)',
                   backgroundColor: 'var(--color-surface-card)',
@@ -224,14 +226,15 @@ export const AdminInspectionsPage: React.FC = () => {
               />
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', minHeight: '40px' }}>
               <input
                 type="checkbox"
                 id="authConfirm"
                 checked={authenticityVerified}
                 onChange={(e) => setAuthenticityVerified(e.target.checked)}
+                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
               />
-              <label htmlFor="authConfirm" style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+              <label htmlFor="authConfirm" style={{ fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
                 Authenticity & Genuine Origin Verified
               </label>
             </div>
@@ -257,17 +260,19 @@ export const AdminInspectionsPage: React.FC = () => {
               />
             </div>
 
-            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.5rem', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 onClick={() => setSelectedProduct(null)}
                 style={{
                   padding: '0.5rem 1rem',
+                  minHeight: '40px',
                   borderRadius: 'var(--radius-sm)',
                   border: '1px solid var(--color-border-light)',
                   backgroundColor: 'transparent',
                   color: 'var(--color-text-main)',
                   fontSize: '0.875rem',
+                  cursor: 'pointer',
                 }}
               >
                 Close
@@ -277,6 +282,7 @@ export const AdminInspectionsPage: React.FC = () => {
                 disabled={isUpdating}
                 style={{
                   padding: '0.5rem 1rem',
+                  minHeight: '40px',
                   borderRadius: 'var(--radius-sm)',
                   border: 'none',
                   backgroundColor: 'var(--color-orange-primary)',

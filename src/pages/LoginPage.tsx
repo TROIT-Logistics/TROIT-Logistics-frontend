@@ -6,6 +6,8 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { ArrowRight, Lock, Mail } from 'lucide-react';
 
+import { Logo } from '@/components/ui/Logo';
+
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -61,19 +63,9 @@ export const LoginPage: React.FC = () => {
         >
           {/* Header with TROIT Logo */}
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-            <Link to="/" style={{ display: 'inline-block', marginBottom: '8px' }}>
-              <span
-                style={{
-                  fontSize: '2.5rem',
-                  fontWeight: 900,
-                  letterSpacing: '-0.04em',
-                  color: 'var(--color-orange-primary)',
-                  display: 'block',
-                }}
-              >
-                TROIT
-              </span>
-            </Link>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+              <Logo size="lg" to="/" />
+            </div>
             <h2 style={{ fontSize: '1.65rem', fontWeight: 800, marginBottom: '6px', color: 'var(--color-text-main)' }}>
               Sign in to TROIT
             </h2>

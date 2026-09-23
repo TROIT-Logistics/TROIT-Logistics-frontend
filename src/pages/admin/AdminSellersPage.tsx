@@ -150,7 +150,7 @@ export const AdminSellersPage: React.FC = () => {
       key: 'trust_level',
       header: 'Trust Metrics',
       render: (item) => (
-        <div style={{ display: 'flex', gap: '0.375rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.375rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <AdminStatusBadge status={item.seller_grade} type="seller_grade" />
           <AdminStatusBadge status={item.trust_level} type="seller_verification" />
         </div>
@@ -173,13 +173,14 @@ export const AdminSellersPage: React.FC = () => {
       header: 'Actions',
       render: (item) => (
         <div
-          style={{ display: 'flex', gap: '0.375rem', alignItems: 'center' }}
+          style={{ display: 'flex', gap: '0.375rem', alignItems: 'center', flexWrap: 'wrap' }}
           onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={() => handleRowClick(item)}
             style={{
-              padding: '5px 10px',
+              padding: '6px 10px',
+              minHeight: '36px',
               fontSize: '0.75rem',
               fontWeight: 700,
               borderRadius: 'var(--radius-sm)',
@@ -192,13 +193,14 @@ export const AdminSellersPage: React.FC = () => {
               gap: '4px',
             }}
           >
-            <Eye size={12} /> View
+            <Eye size={14} /> View
           </button>
           {item.verification_status !== 'VERIFIED' && (
             <button
               onClick={() => setConfirmModal({ type: 'VERIFIED', seller: item })}
               style={{
-                padding: '5px 10px',
+                padding: '6px 10px',
+                minHeight: '36px',
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 borderRadius: 'var(--radius-sm)',
@@ -211,14 +213,15 @@ export const AdminSellersPage: React.FC = () => {
                 gap: '4px',
               }}
             >
-              <CheckCircle size={12} /> Approve
+              <CheckCircle size={14} /> Approve
             </button>
           )}
           {item.verification_status !== 'REJECTED' && (
             <button
               onClick={() => setConfirmModal({ type: 'REJECTED', seller: item })}
               style={{
-                padding: '5px 10px',
+                padding: '6px 10px',
+                minHeight: '36px',
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 borderRadius: 'var(--radius-sm)',
@@ -231,7 +234,7 @@ export const AdminSellersPage: React.FC = () => {
                 gap: '4px',
               }}
             >
-              <XCircle size={12} /> Reject
+              <XCircle size={14} /> Reject
             </button>
           )}
         </div>
@@ -240,7 +243,7 @@ export const AdminSellersPage: React.FC = () => {
   ];
 
   const filterElement = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', flexWrap: 'wrap' }}>
       <label style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
         Status:
       </label>
@@ -252,6 +255,7 @@ export const AdminSellersPage: React.FC = () => {
         }}
         style={{
           padding: '0.5rem 0.75rem',
+          minHeight: '40px',
           fontSize: '0.84rem',
           borderRadius: 'var(--radius-sm)',
           border: '1px solid var(--color-border-light)',
@@ -259,6 +263,8 @@ export const AdminSellersPage: React.FC = () => {
           color: 'var(--color-text-main)',
           outline: 'none',
           cursor: 'pointer',
+          flex: 1,
+          minWidth: '140px',
         }}
       >
         <option value="ALL">All Statuses</option>
@@ -290,7 +296,8 @@ export const AdminSellersPage: React.FC = () => {
             gap: '8px',
           }}
         >
-          <CheckCircle size={18} /> {actionSuccess}
+          <CheckCircle size={18} />
+          {actionSuccess}
         </div>
       )}
 
@@ -309,7 +316,8 @@ export const AdminSellersPage: React.FC = () => {
             gap: '8px',
           }}
         >
-          <AlertCircle size={18} /> {actionError}
+          <AlertCircle size={18} />
+          {actionError}
         </div>
       )}
 
@@ -319,9 +327,9 @@ export const AdminSellersPage: React.FC = () => {
         keyExtractor={(item) => item.seller_id}
         loading={loading}
         error={error}
-        emptyTitle="No Merchant Sellers Found"
-        emptyDescription="No seller profiles matched the selected verification status or search query."
-        isServerSide
+        emptyTitle="No Sellers Registered"
+        emptyDescription="No merchant sellers match your search or filter parameters."
+        isServerSide={true}
         page={page}
         totalPages={totalPages}
         totalRecords={totalRecords}
@@ -342,13 +350,13 @@ export const AdminSellersPage: React.FC = () => {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            backdropFilter: 'blur(3px)',
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(4px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 1000,
-            padding: '1rem',
+            padding: '0.75rem',
           }}
           onClick={() => setSelectedSeller(null)}
         >
@@ -357,13 +365,13 @@ export const AdminSellersPage: React.FC = () => {
             style={{
               backgroundColor: 'var(--color-surface)',
               border: '1px solid var(--color-border-light)',
-              borderRadius: 'var(--radius-md)',
-              width: '100%',
+              borderRadius: 'var(--radius-lg)',
+              width: 'calc(100vw - 1.5rem)',
               maxWidth: '680px',
-              maxHeight: '90vh',
+              maxHeight: '88vh',
               overflowY: 'auto',
               boxShadow: 'var(--shadow-lg)',
-              padding: '1.75rem',
+              padding: '1.25rem',
             }}
           >
             {/* Modal Header */}
@@ -372,38 +380,41 @@ export const AdminSellersPage: React.FC = () => {
                 display: 'flex',
                 alignItems: 'flex-start',
                 justifyContent: 'space-between',
-                marginBottom: '1.5rem',
+                marginBottom: '1.25rem',
                 borderBottom: '1px solid var(--color-border-light)',
                 paddingBottom: '1rem',
+                gap: '0.75rem',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
                 <div
                   style={{
-                    width: '3.25rem',
-                    height: '3.25rem',
+                    width: '3rem',
+                    height: '3rem',
                     borderRadius: 'var(--radius-sm)',
                     backgroundColor: 'rgba(255, 77, 0, 0.12)',
                     color: 'var(--color-orange-primary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    flexShrink: 0,
                   }}
                 >
-                  <Store size={26} />
+                  <Store size={24} />
                 </div>
-                <div>
+                <div style={{ minWidth: 0 }}>
                   <h3
                     style={{
-                      fontSize: '1.25rem',
+                      fontSize: '1.15rem',
                       fontWeight: 800,
                       color: 'var(--color-text-main)',
                       margin: 0,
+                      wordBreak: 'break-word',
                     }}
                   >
                     {selectedSeller.store_name || 'Unnamed Merchant Store'}
                   </h3>
-                  <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                  <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '2px', wordBreak: 'break-word' }}>
                     {selectedSeller.store_address || 'No physical store address recorded'}
                   </div>
                 </div>
@@ -416,8 +427,15 @@ export const AdminSellersPage: React.FC = () => {
                   border: 'none',
                   cursor: 'pointer',
                   color: 'var(--color-text-muted)',
-                  padding: '4px',
+                  padding: '0.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minWidth: '40px',
+                  minHeight: '40px',
+                  flexShrink: 0,
                 }}
+                aria-label="Close modal"
               >
                 <X size={20} />
               </button>
@@ -429,8 +447,8 @@ export const AdminSellersPage: React.FC = () => {
                 backgroundColor: 'var(--color-surface-card)',
                 border: '1px solid var(--color-border-light)',
                 borderRadius: 'var(--radius-md)',
-                padding: '1.25rem',
-                marginBottom: '1.5rem',
+                padding: '1rem',
+                marginBottom: '1.25rem',
               }}
             >
               <div
@@ -438,7 +456,9 @@ export const AdminSellersPage: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginBottom: '1rem',
+                  marginBottom: '0.875rem',
+                  flexWrap: 'wrap',
+                  gap: '0.75rem',
                 }}
               >
                 <div>
@@ -450,14 +470,15 @@ export const AdminSellersPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   {selectedSeller.verification_status !== 'VERIFIED' && (
                     <button
                       onClick={() => setConfirmModal({ type: 'VERIFIED', seller: selectedSeller })}
                       disabled={actionLoading}
                       style={{
-                        padding: '8px 16px',
-                        fontSize: '0.85rem',
+                        padding: '0.5rem 1rem',
+                        minHeight: '40px',
+                        fontSize: '0.84rem',
                         fontWeight: 800,
                         borderRadius: 'var(--radius-sm)',
                         border: 'none',
@@ -478,8 +499,9 @@ export const AdminSellersPage: React.FC = () => {
                       onClick={() => setConfirmModal({ type: 'REJECTED', seller: selectedSeller })}
                       disabled={actionLoading}
                       style={{
-                        padding: '8px 16px',
-                        fontSize: '0.85rem',
+                        padding: '0.5rem 1rem',
+                        minHeight: '40px',
+                        fontSize: '0.84rem',
                         fontWeight: 800,
                         borderRadius: 'var(--radius-sm)',
                         border: '1px solid #EF4444',
@@ -497,13 +519,13 @@ export const AdminSellersPage: React.FC = () => {
                 </div>
               </div>
 
-              <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>
                 Approving verification grants this seller permission to list verified products. Rejection restricts listing access while preserving store details.
               </div>
             </div>
 
             {/* Badges & Trust Summary */}
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
               <AdminStatusBadge status={selectedSeller.seller_grade} type="seller_grade" size="lg" />
               <AdminStatusBadge status={selectedSeller.trust_level} type="seller_verification" size="lg" />
             </div>
@@ -512,12 +534,12 @@ export const AdminSellersPage: React.FC = () => {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '1rem',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                gap: '0.875rem',
                 backgroundColor: 'var(--color-surface-card)',
-                padding: '1.25rem',
+                padding: '1rem',
                 borderRadius: 'var(--radius-sm)',
-                marginBottom: '1.5rem',
+                marginBottom: '1.25rem',
                 fontSize: '0.875rem',
               }}
             >
@@ -528,7 +550,7 @@ export const AdminSellersPage: React.FC = () => {
                 <strong>{selectedSeller.user_full_name}</strong>
               </div>
 
-              <div>
+              <div style={{ wordBreak: 'break-all' }}>
                 <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Mail size={12} /> Email Address
                 </span>
@@ -586,7 +608,7 @@ export const AdminSellersPage: React.FC = () => {
                 style={{
                   fontSize: '0.9375rem',
                   fontWeight: 800,
-                  marginBottom: '1rem',
+                  marginBottom: '0.75rem',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem',
@@ -619,7 +641,7 @@ export const AdminSellersPage: React.FC = () => {
                     <div
                       key={item.id}
                       style={{
-                        padding: '0.75rem 1rem',
+                        padding: '0.75rem 0.875rem',
                         backgroundColor: 'var(--color-surface-card)',
                         border: '1px solid var(--color-border-light)',
                         borderRadius: 'var(--radius-sm)',
@@ -627,6 +649,8 @@ export const AdminSellersPage: React.FC = () => {
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         fontSize: '0.84rem',
+                        flexWrap: 'wrap',
+                        gap: '0.375rem',
                       }}
                     >
                       <div>
@@ -655,13 +679,13 @@ export const AdminSellersPage: React.FC = () => {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            backgroundColor: 'rgba(0, 0, 0, 0.65)',
             backdropFilter: 'blur(4px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 1100,
-            padding: '1rem',
+            padding: '0.75rem',
           }}
           onClick={() => setConfirmModal(null)}
         >
@@ -671,17 +695,17 @@ export const AdminSellersPage: React.FC = () => {
               backgroundColor: 'var(--color-surface)',
               border: '1px solid var(--color-border-light)',
               borderRadius: 'var(--radius-md)',
-              width: '100%',
+              width: 'calc(100vw - 1.5rem)',
               maxWidth: '440px',
-              padding: '1.5rem',
+              padding: '1.25rem',
               boxShadow: 'var(--shadow-lg)',
             }}
           >
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '8px', color: 'var(--color-text-main)' }}>
               Confirm Verification {confirmModal.type === 'VERIFIED' ? 'Approval' : 'Rejection'}
             </h3>
 
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', lineHeight: 1.5, marginBottom: '20px' }}>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', lineHeight: 1.5, marginBottom: '16px' }}>
               Are you sure you want to mark verification status as{' '}
               <strong style={{ color: confirmModal.type === 'VERIFIED' ? '#10B981' : '#EF4444' }}>
                 {confirmModal.type}
@@ -689,12 +713,12 @@ export const AdminSellersPage: React.FC = () => {
               for store <strong>"{confirmModal.seller.store_name || confirmModal.seller.user_full_name}"</strong>?
             </p>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', flexWrap: 'wrap' }}>
               <button
                 onClick={() => setConfirmModal(null)}
                 disabled={actionLoading}
                 className="btn btn-dark"
-                style={{ fontSize: '0.85rem' }}
+                style={{ fontSize: '0.85rem', minHeight: '40px' }}
               >
                 Cancel
               </button>
@@ -703,7 +727,8 @@ export const AdminSellersPage: React.FC = () => {
                 onClick={handleExecuteVerificationUpdate}
                 disabled={actionLoading}
                 style={{
-                  padding: '8px 16px',
+                  padding: '0.5rem 1rem',
+                  minHeight: '40px',
                   fontSize: '0.85rem',
                   fontWeight: 800,
                   borderRadius: 'var(--radius-sm)',

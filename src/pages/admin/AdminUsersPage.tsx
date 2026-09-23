@@ -122,7 +122,7 @@ export const AdminUsersPage: React.FC = () => {
   ];
 
   const filterElement = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', flexWrap: 'wrap' }}>
       <label style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
         Role:
       </label>
@@ -134,6 +134,7 @@ export const AdminUsersPage: React.FC = () => {
         }}
         style={{
           padding: '0.5rem 0.75rem',
+          minHeight: '40px',
           fontSize: '0.84rem',
           borderRadius: 'var(--radius-sm)',
           border: '1px solid var(--color-border-light)',
@@ -141,6 +142,8 @@ export const AdminUsersPage: React.FC = () => {
           color: 'var(--color-text-main)',
           outline: 'none',
           cursor: 'pointer',
+          flex: 1,
+          minWidth: '140px',
         }}
       >
         <option value="ALL">All Roles</option>

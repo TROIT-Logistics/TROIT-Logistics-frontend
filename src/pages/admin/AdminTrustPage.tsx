@@ -33,22 +33,22 @@ export const AdminTrustPage: React.FC = () => {
       {/* Core TROIT Rule Banner */}
       <div
         style={{
-          padding: '1.25rem 1.5rem',
+          padding: '1.25rem 1.25rem',
           backgroundColor: 'rgba(255, 77, 0, 0.08)',
           border: '1px solid rgba(255, 77, 0, 0.25)',
           borderRadius: 'var(--radius-md)',
-          marginBottom: '1.5rem',
+          marginBottom: '1.25rem',
           display: 'flex',
           alignItems: 'flex-start',
-          gap: '1rem',
+          gap: '0.875rem',
         }}
       >
         <Info size={24} color="var(--color-orange-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
         <div>
-          <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--color-orange-primary)', margin: 0 }}>
+          <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-orange-primary)', margin: 0 }}>
             CRITICAL TROIT LOGISTICS RULE
           </h4>
-          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-main)', margin: '0.25rem 0 0 0', lineHeight: 1.5 }}>
+          <p style={{ fontSize: '0.84rem', color: 'var(--color-text-main)', margin: '0.25rem 0 0 0', lineHeight: 1.5 }}>
             <strong>Grade does not represent product quality.</strong> It represents the level of trust the supplier has built with TROIT through verified fulfillment performance, successful escrows, and operational compliance. Physical product condition is evaluated separately during physical inspection.
           </p>
         </div>
@@ -60,20 +60,20 @@ export const AdminTrustPage: React.FC = () => {
           backgroundColor: 'var(--color-surface)',
           border: '1px solid var(--color-border-light)',
           borderRadius: 'var(--radius-md)',
-          padding: '1.5rem',
-          marginBottom: '2rem',
+          padding: '1.25rem',
+          marginBottom: '1.5rem',
           boxShadow: 'var(--shadow-sm)',
         }}
       >
-        <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--color-text-main)', marginBottom: '0.5rem' }}>
+        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-text-main)', marginBottom: '0.375rem' }}>
           Seller Trust History Audit
         </h3>
-        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
+        <p style={{ fontSize: '0.84rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
           Query live trust level transitions and reason audit logs by Seller UUID.
         </p>
 
-        <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.75rem', maxWidth: '600px' }}>
-          <div style={{ position: 'relative', flex: 1 }}>
+        <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.75rem', maxWidth: '600px', flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
             <Search
               size={18}
               style={{
@@ -94,8 +94,9 @@ export const AdminTrustPage: React.FC = () => {
                 width: '100%',
                 paddingLeft: '2.5rem',
                 paddingRight: '1rem',
-                paddingTop: '0.625rem',
-                paddingBottom: '0.625rem',
+                paddingTop: '0.5625rem',
+                paddingBottom: '0.5625rem',
+                minHeight: '40px',
                 fontSize: '0.875rem',
                 borderRadius: 'var(--radius-sm)',
                 border: '1px solid var(--color-border-light)',
@@ -110,7 +111,8 @@ export const AdminTrustPage: React.FC = () => {
             type="submit"
             disabled={loading}
             style={{
-              padding: '0.625rem 1.25rem',
+              padding: '0.5625rem 1.25rem',
+              minHeight: '40px',
               borderRadius: 'var(--radius-sm)',
               border: 'none',
               backgroundColor: 'var(--color-orange-primary)',
@@ -139,42 +141,44 @@ export const AdminTrustPage: React.FC = () => {
             backgroundColor: 'var(--color-surface)',
             border: '1px solid var(--color-border-light)',
             borderRadius: 'var(--radius-md)',
-            padding: '1.5rem',
+            padding: '1.25rem',
             boxShadow: 'var(--shadow-sm)',
           }}
         >
-          <h4 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <ShieldCheck size={20} color="var(--color-orange-primary)" /> Trust Log Audit Trail for Seller {sellerId}
+          <h4 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', wordBreak: 'break-all' }}>
+            <ShieldCheck size={20} color="var(--color-orange-primary)" style={{ flexShrink: 0 }} /> Trust Log Audit Trail for Seller {sellerId}
           </h4>
 
           {history.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--color-text-muted)' }}>
+            <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
               No trust transitions recorded for this seller yet. The backend history log is empty.
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {history.map((item) => (
                 <div
                   key={item.id}
                   style={{
-                    padding: '1rem 1.25rem',
+                    padding: '0.875rem 1rem',
                     backgroundColor: 'var(--color-surface-card)',
                     border: '1px solid var(--color-border-light)',
                     borderRadius: 'var(--radius-sm)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '0.5rem',
                   }}
                 >
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.9375rem', color: 'var(--color-text-main)' }}>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--color-text-main)' }}>
                       Level Transition: {item.old_level} → <span style={{ color: 'var(--color-orange-primary)' }}>{item.new_level}</span>
                     </div>
-                    <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>
+                    <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '0.25rem', wordBreak: 'break-word' }}>
                       Reason: {item.reason}
                     </div>
                     {item.trigger_transaction_id && (
-                      <div style={{ fontSize: '0.75rem', color: 'var(--color-text-light)', marginTop: '2px' }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--color-text-light)', marginTop: '2px', wordBreak: 'break-all' }}>
                         Transaction ID: <code style={{ fontFamily: 'monospace' }}>{item.trigger_transaction_id}</code>
                       </div>
                     )}

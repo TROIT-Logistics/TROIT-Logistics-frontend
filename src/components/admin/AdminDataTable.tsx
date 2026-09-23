@@ -140,10 +140,13 @@ export function AdminDataTable<T>({
         borderRadius: 'var(--radius-md)',
         boxShadow: 'var(--shadow-sm)',
         overflow: 'hidden',
+        width: '100%',
+        maxWidth: '100%',
       }}
     >
       {/* Table Header Filter Toolbar */}
       <div
+        className="admin-table-toolbar"
         style={{
           padding: '1rem 1.25rem',
           borderBottom: '1px solid var(--color-border-light)',
@@ -154,8 +157,11 @@ export function AdminDataTable<T>({
           flexWrap: 'wrap',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative', flex: 1, minWidth: '220px', maxWidth: '360px' }}>
+        <div
+          className="admin-table-controls"
+          style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, flexWrap: 'wrap' }}
+        >
+          <div className="admin-search-wrapper" style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
             <Search
               size={16}
               style={{
@@ -175,23 +181,24 @@ export function AdminDataTable<T>({
                 width: '100%',
                 paddingLeft: '2.25rem',
                 paddingRight: '0.875rem',
-                paddingTop: '0.5rem',
-                paddingBottom: '0.5rem',
+                paddingTop: '0.5625rem',
+                paddingBottom: '0.5625rem',
                 fontSize: '0.84rem',
                 borderRadius: 'var(--radius-sm)',
                 border: '1px solid var(--color-border-light)',
                 backgroundColor: 'var(--color-surface-card)',
                 color: 'var(--color-text-main)',
                 outline: 'none',
+                minHeight: '40px',
               }}
             />
           </div>
 
-          {filterElement}
+          {filterElement && <div className="admin-filter-element-container">{filterElement}</div>}
         </div>
 
-        <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-          Showing {displayCount} total records
+        <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
+          Showing {displayCount} records
         </div>
       </div>
 
@@ -212,8 +219,16 @@ export function AdminDataTable<T>({
       )}
 
       {/* Table Container */}
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+      <div
+        className="admin-table-container"
+        style={{
+          overflowX: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          width: '100%',
+          maxWidth: '100%',
+        }}
+      >
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem', minWidth: '640px' }}>
           <thead>
             <tr style={{ backgroundColor: 'var(--color-surface-card)', borderBottom: '1px solid var(--color-border-light)' }}>
               {columns.map((col) => (
@@ -221,7 +236,7 @@ export function AdminDataTable<T>({
                   key={col.key}
                   onClick={() => col.sortable !== false && handleSort(col.key)}
                   style={{
-                    padding: '0.75rem 1.25rem',
+                    padding: '0.875rem 1.25rem',
                     fontWeight: 700,
                     fontSize: '0.75rem',
                     textTransform: 'uppercase',
@@ -293,7 +308,7 @@ export function AdminDataTable<T>({
                     <td
                       key={col.key}
                       style={{
-                        padding: '1rem 1.25rem',
+                        padding: '0.875rem 1.25rem',
                         color: 'var(--color-text-main)',
                         textAlign: col.align || 'left',
                         verticalAlign: 'middle',
@@ -316,12 +331,15 @@ export function AdminDataTable<T>({
       {/* Pagination Footer */}
       {!loading && (totalPages > 1 || (isServerSide && totalRecords !== undefined)) && (
         <div
+          className="admin-table-pagination"
           style={{
             padding: '0.875rem 1.25rem',
             borderTop: '1px solid var(--color-border-light)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            gap: '0.75rem',
+            flexWrap: 'wrap',
             fontSize: '0.8125rem',
             color: 'var(--color-text-muted)',
           }}
@@ -330,7 +348,7 @@ export function AdminDataTable<T>({
             Page {currentPage} of {totalPages}
           </div>
 
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', width: 'auto' }}>
             <button
               onClick={() => changePage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
@@ -338,13 +356,15 @@ export function AdminDataTable<T>({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.25rem',
-                padding: '0.375rem 0.75rem',
+                padding: '0.5rem 0.875rem',
+                minHeight: '40px',
                 borderRadius: 'var(--radius-sm)',
                 border: '1px solid var(--color-border-light)',
                 backgroundColor: 'var(--color-surface)',
                 color: 'var(--color-text-main)',
                 cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
                 opacity: currentPage === 1 ? 0.5 : 1,
+                fontWeight: 600,
               }}
             >
               <ChevronLeft size={16} /> Previous
@@ -357,13 +377,15 @@ export function AdminDataTable<T>({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.25rem',
-                padding: '0.375rem 0.75rem',
+                padding: '0.5rem 0.875rem',
+                minHeight: '40px',
                 borderRadius: 'var(--radius-sm)',
                 border: '1px solid var(--color-border-light)',
                 backgroundColor: 'var(--color-surface)',
                 color: 'var(--color-text-main)',
                 cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer',
                 opacity: currentPage >= totalPages ? 0.5 : 1,
+                fontWeight: 600,
               }}
             >
               Next <ChevronRight size={16} />
@@ -371,7 +393,31 @@ export function AdminDataTable<T>({
           </div>
         </div>
       )}
+
+      <style>{`
+        @media (max-width: 640px) {
+          .admin-table-toolbar {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            padding: 0.875rem 1rem !important;
+          }
+          .admin-table-controls {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            width: 100% !important;
+          }
+          .admin-search-wrapper,
+          .admin-filter-element-container {
+            width: 100% !important;
+            min-width: 100% !important;
+          }
+          .admin-table-pagination {
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center;
+          }
+        }
+      `}</style>
     </div>
   );
 }
-

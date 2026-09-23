@@ -133,7 +133,7 @@ export const AdminOverviewPage: React.FC = () => {
             border: '1px solid rgba(239, 68, 68, 0.3)',
             borderRadius: 'var(--radius-sm)',
             color: '#DC2626',
-            marginBottom: '1.5rem',
+            marginBottom: '1.25rem',
             fontSize: '0.875rem',
           }}
         >
@@ -143,48 +143,49 @@ export const AdminOverviewPage: React.FC = () => {
 
       {/* KPI Section */}
       <div
+        className="admin-kpi-grid"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '1.25rem',
-          marginBottom: '2rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+          gap: '1rem',
+          marginBottom: '1.5rem',
         }}
       >
         <AdminStatCard
           title="Total Products"
           value={totalProducts}
-          subtitle="Live marketplace listings"
+          subtitle="Live listings"
           icon={Package}
           loading={loading}
-          badge={{ text: 'LIVE API', variant: 'success' }}
+          badge={{ text: 'LIVE', variant: 'success' }}
         />
 
         <AdminStatCard
           title="Total Orders"
           value={totalOrders}
-          subtitle="All platform transactions"
+          subtitle="All transactions"
           icon={ShoppingBag}
           loading={loading}
-          badge={{ text: 'LIVE API', variant: 'success' }}
+          badge={{ text: 'LIVE', variant: 'success' }}
         />
 
         <AdminStatCard
           title="Protected Escrow"
           value={protectedEscrowOrders}
-          subtitle="Orders with escrow held"
+          subtitle="Escrow held"
           icon={CheckCircle2}
           loading={loading}
-          badge={{ text: 'ESCROW ACTIVE', variant: 'info' }}
+          badge={{ text: 'ACTIVE', variant: 'info' }}
         />
 
         <AdminStatCard
           title="Pending Inspections"
           value={pendingProductVerifications}
-          subtitle="Products awaiting verification"
+          subtitle="Awaiting verify"
           icon={Clock}
           loading={loading}
           badge={{
-            text: pendingProductVerifications > 0 ? 'ATTENTION REQUIRED' : 'CLEAR',
+            text: pendingProductVerifications > 0 ? 'ATTENTION' : 'CLEAR',
             variant: pendingProductVerifications > 0 ? 'warning' : 'success',
           }}
         />
@@ -192,7 +193,7 @@ export const AdminOverviewPage: React.FC = () => {
         <AdminStatCard
           title="Backend Health"
           value={health ? 'ONLINE' : 'CHECKING'}
-          subtitle={health ? `Version v${health.version}` : 'Connecting to Render...'}
+          subtitle={health ? `v${health.version}` : 'Connecting...'}
           icon={Activity}
           loading={loading}
           badge={{ text: health?.status === 'ok' ? 'HEALTHY' : 'PENDING', variant: 'success' }}
@@ -205,14 +206,14 @@ export const AdminOverviewPage: React.FC = () => {
           backgroundColor: 'var(--color-surface)',
           border: '1px solid var(--color-border-light)',
           borderRadius: 'var(--radius-md)',
-          padding: '1.5rem',
-          marginBottom: '2rem',
+          padding: '1.25rem',
+          marginBottom: '1.5rem',
           boxShadow: 'var(--shadow-sm)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0 }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0 }}>
               Pending Operations Queue
             </h3>
             <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', margin: '0.25rem 0 0 0' }}>
@@ -224,15 +225,15 @@ export const AdminOverviewPage: React.FC = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '1rem',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '0.875rem',
           }}
         >
           {/* Action item 1 */}
           <div
             onClick={() => navigate('/admin/products')}
             style={{
-              padding: '1rem 1.25rem',
+              padding: '0.875rem 1rem',
               backgroundColor: 'var(--color-surface-card)',
               border: '1px solid var(--color-border-light)',
               borderRadius: 'var(--radius-sm)',
@@ -240,15 +241,16 @@ export const AdminOverviewPage: React.FC = () => {
               alignItems: 'center',
               justifyContent: 'space-between',
               cursor: 'pointer',
-              transition: 'border-color 0.15s ease',
+              transition: 'all 0.15s ease',
+              minHeight: '44px',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ padding: '0.5rem', backgroundColor: 'rgba(245, 184, 66, 0.15)', color: '#D97706', borderRadius: 'var(--radius-sm)' }}>
-                <Clock size={20} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
+              <div style={{ padding: '0.5rem', backgroundColor: 'rgba(245, 184, 66, 0.15)', color: '#D97706', borderRadius: 'var(--radius-sm)', flexShrink: 0 }}>
+                <Clock size={18} />
               </div>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: '0.9375rem', color: 'var(--color-text-main)' }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--color-text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   Product Verifications
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
@@ -256,14 +258,14 @@ export const AdminOverviewPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            <ArrowUpRight size={18} color="var(--color-text-light)" />
+            <ArrowUpRight size={18} color="var(--color-text-light)" style={{ flexShrink: 0 }} />
           </div>
 
           {/* Action item 2 */}
           <div
             onClick={() => navigate('/admin/disputes')}
             style={{
-              padding: '1rem 1.25rem',
+              padding: '0.875rem 1rem',
               backgroundColor: 'var(--color-surface-card)',
               border: '1px solid var(--color-border-light)',
               borderRadius: 'var(--radius-sm)',
@@ -271,14 +273,15 @@ export const AdminOverviewPage: React.FC = () => {
               alignItems: 'center',
               justifyContent: 'space-between',
               cursor: 'pointer',
+              minHeight: '44px',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ padding: '0.5rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#DC2626', borderRadius: 'var(--radius-sm)' }}>
-                <ShieldAlert size={20} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
+              <div style={{ padding: '0.5rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#DC2626', borderRadius: 'var(--radius-sm)', flexShrink: 0 }}>
+                <ShieldAlert size={18} />
               </div>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: '0.9375rem', color: 'var(--color-text-main)' }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--color-text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   Open Order Disputes
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
@@ -286,15 +289,15 @@ export const AdminOverviewPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            <ArrowUpRight size={18} color="var(--color-text-light)" />
+            <ArrowUpRight size={18} color="var(--color-text-light)" style={{ flexShrink: 0 }} />
           </div>
         </div>
       </div>
 
       {/* Recent Orders Section */}
-      <div style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0 }}>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.875rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0 }}>
             Recent Platform Orders
           </h3>
           <button
@@ -304,11 +307,12 @@ export const AdminOverviewPage: React.FC = () => {
               border: 'none',
               color: 'var(--color-orange-primary)',
               fontWeight: 700,
-              fontSize: '0.875rem',
+              fontSize: '0.84rem',
               cursor: 'pointer',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '0.25rem',
+              minHeight: '36px',
             }}
           >
             View All Orders <ArrowUpRight size={16} />

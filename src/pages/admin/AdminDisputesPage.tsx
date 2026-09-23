@@ -173,16 +173,16 @@ export const AdminDisputesPage: React.FC = () => {
             <div
               style={{
                 backgroundColor: 'var(--color-surface-card)',
-                padding: '1rem',
+                padding: '0.875rem 1rem',
                 borderRadius: 'var(--radius-sm)',
                 display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
                 gap: '0.75rem',
                 fontSize: '0.8125rem',
               }}
             >
-              <div>Buyer UUID: <code>{selectedOrder.buyer_id}</code></div>
-              <div>Seller UUID: <code>{selectedOrder.seller_id}</code></div>
+              <div style={{ wordBreak: 'break-all' }}>Buyer UUID: <code>{selectedOrder.buyer_id}</code></div>
+              <div style={{ wordBreak: 'break-all' }}>Seller UUID: <code>{selectedOrder.seller_id}</code></div>
               <div>Order Status: <strong>{selectedOrder.status}</strong></div>
               <div>Escrow State: <strong>{selectedOrder.payment_status}</strong></div>
             </div>
@@ -218,6 +218,7 @@ export const AdminDisputesPage: React.FC = () => {
                     disabled={isUpdating}
                     style={{
                       padding: '0.5rem 1rem',
+                      minHeight: '40px',
                       borderRadius: 'var(--radius-sm)',
                       border: 'none',
                       backgroundColor: '#DC2626',
@@ -236,6 +237,7 @@ export const AdminDisputesPage: React.FC = () => {
                   disabled={isUpdating}
                   style={{
                     padding: '0.5rem 1rem',
+                    minHeight: '40px',
                     borderRadius: 'var(--radius-sm)',
                     border: 'none',
                     backgroundColor: 'var(--color-orange-primary)',

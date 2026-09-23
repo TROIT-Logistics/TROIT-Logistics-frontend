@@ -139,13 +139,14 @@ export const AdminProductsPage: React.FC = () => {
   return (
     <AdminLayout title="Product Management" subtitle="Review marketplace products and execute physical inspections">
       {/* Filter Tabs */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.25rem' }}>
         {['ALL', 'PENDING', 'VERIFIED', 'REJECTED'].map((st) => (
           <button
             key={st}
             onClick={() => setFilterStatus(st)}
             style={{
               padding: '0.5rem 1rem',
+              minHeight: '40px',
               borderRadius: 'var(--radius-pill)',
               border: '1px solid var(--color-border-light)',
               backgroundColor: filterStatus === st ? 'var(--color-orange-primary)' : 'var(--color-surface)',
@@ -153,6 +154,7 @@ export const AdminProductsPage: React.FC = () => {
               fontWeight: 600,
               fontSize: '0.8125rem',
               cursor: 'pointer',
+              transition: 'all 0.15s ease',
             }}
           >
             {st} ({st === 'ALL' ? products.length : products.filter((p) => p.verification_status === st).length})
@@ -165,8 +167,8 @@ export const AdminProductsPage: React.FC = () => {
         data={filteredProducts}
         keyExtractor={(p) => p.id}
         loading={loading}
-        emptyTitle="No Products Found"
-        emptyDescription="No products match the selected status filter."
+        emptyTitle="No Products Match Filter"
+        emptyDescription="There are no marketplace products matching the selected verification criteria."
         onRowClick={(p) => {
           setSelectedProduct(p);
           setActionSuccess(null);
@@ -174,28 +176,29 @@ export const AdminProductsPage: React.FC = () => {
         }}
       />
 
-      {/* Product Detail & Inspection Modal */}
+      {/* Product Detail & Inspection Dialog */}
       {selectedProduct && (
         <AdminDetailModal
-          isOpen={!!selectedProduct}
+          isOpen={Boolean(selectedProduct)}
           onClose={() => setSelectedProduct(null)}
           title={selectedProduct.name}
-          subtitle={`ID: ${selectedProduct.id}`}
+          subtitle={`Product UUID: ${selectedProduct.id}`}
           footerActions={
             !showInspectionForm ? (
-              <>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', width: '100%', justifyContent: 'flex-end' }}>
                 <button
                   onClick={() => setShowInspectionForm(true)}
                   style={{
                     padding: '0.5rem 1rem',
+                    minHeight: '40px',
                     borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--color-border-light)',
-                    backgroundColor: 'var(--color-surface)',
-                    color: 'var(--color-text-main)',
-                    fontWeight: 600,
-                    fontSize: '0.875rem',
+                    border: '1px solid var(--color-orange-primary)',
+                    backgroundColor: 'rgba(255, 77, 0, 0.08)',
+                    color: 'var(--color-orange-primary)',
+                    fontWeight: 700,
+                    fontSize: '0.84rem',
                     cursor: 'pointer',
-                    display: 'flex',
+                    display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.375rem',
                   }}
@@ -209,14 +212,15 @@ export const AdminProductsPage: React.FC = () => {
                     disabled={isUpdating}
                     style={{
                       padding: '0.5rem 1rem',
+                      minHeight: '40px',
                       borderRadius: 'var(--radius-sm)',
                       border: 'none',
                       backgroundColor: '#DC2626',
                       color: '#FFFFFF',
-                      fontWeight: 600,
-                      fontSize: '0.875rem',
+                      fontWeight: 700,
+                      fontSize: '0.84rem',
                       cursor: 'pointer',
-                      display: 'flex',
+                      display: 'inline-flex',
                       alignItems: 'center',
                       gap: '0.375rem',
                     }}
@@ -231,14 +235,15 @@ export const AdminProductsPage: React.FC = () => {
                     disabled={isUpdating}
                     style={{
                       padding: '0.5rem 1rem',
+                      minHeight: '40px',
                       borderRadius: 'var(--radius-sm)',
                       border: 'none',
                       backgroundColor: '#059669',
                       color: '#FFFFFF',
-                      fontWeight: 600,
-                      fontSize: '0.875rem',
+                      fontWeight: 700,
+                      fontSize: '0.84rem',
                       cursor: 'pointer',
-                      display: 'flex',
+                      display: 'inline-flex',
                       alignItems: 'center',
                       gap: '0.375rem',
                     }}
@@ -246,7 +251,7 @@ export const AdminProductsPage: React.FC = () => {
                     <CheckCircle2 size={16} /> Verify Product
                   </button>
                 )}
-              </>
+              </div>
             ) : null
           }
         >
@@ -272,8 +277,8 @@ export const AdminProductsPage: React.FC = () => {
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gap: '1rem',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                  gap: '0.875rem',
                   backgroundColor: 'var(--color-surface-card)',
                   padding: '1rem',
                   borderRadius: 'var(--radius-sm)',
@@ -292,14 +297,14 @@ export const AdminProductsPage: React.FC = () => {
                   <span style={{ fontWeight: 700 }}>{selectedProduct.stock} units</span>
                 </div>
                 <div>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'block' }}>Verification Status</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'block' }}>Verification</span>
                   <AdminStatusBadge status={selectedProduct.verification_status} type="product_verification" />
                 </div>
               </div>
 
               <div>
                 <h4 style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.375rem' }}>Description</h4>
-                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5, wordBreak: 'break-word' }}>
                   {selectedProduct.description || 'No description provided.'}
                 </p>
               </div>
@@ -309,7 +314,7 @@ export const AdminProductsPage: React.FC = () => {
                   <Shield size={16} color="var(--color-orange-primary)" /> Admin Metadata (Internal Only)
                 </h4>
                 <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                  <div>Seller ID: <code style={{ color: 'var(--color-text-main)' }}>{selectedProduct.seller_id}</code></div>
+                  <div style={{ wordBreak: 'break-all' }}>Seller ID: <code style={{ color: 'var(--color-text-main)' }}>{selectedProduct.seller_id}</code></div>
                   <div>African Made: <strong>{selectedProduct.is_african_made ? 'Yes' : 'No'}</strong></div>
                   <div>Warranty Months: <strong>{selectedProduct.warranty_months} months</strong></div>
                   <div>Last Inspected: <strong>{selectedProduct.last_inspected_at ? new Date(selectedProduct.last_inspected_at).toLocaleString() : 'Never'}</strong></div>
@@ -356,6 +361,7 @@ export const AdminProductsPage: React.FC = () => {
                   style={{
                     width: '100%',
                     padding: '0.5rem 0.625rem',
+                    minHeight: '40px',
                     borderRadius: 'var(--radius-sm)',
                     border: '1px solid var(--color-border-light)',
                     backgroundColor: 'var(--color-surface-card)',
@@ -365,14 +371,15 @@ export const AdminProductsPage: React.FC = () => {
                 />
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', minHeight: '40px' }}>
                 <input
                   type="checkbox"
                   id="authCheck"
                   checked={authenticityVerified}
                   onChange={(e) => setAuthenticityVerified(e.target.checked)}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                 />
-                <label htmlFor="authCheck" style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                <label htmlFor="authCheck" style={{ fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
                   Authenticity Confirmed & Verified
                 </label>
               </div>
@@ -398,17 +405,19 @@ export const AdminProductsPage: React.FC = () => {
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.5rem', flexWrap: 'wrap' }}>
                 <button
                   type="button"
                   onClick={() => setShowInspectionForm(false)}
                   style={{
                     padding: '0.5rem 1rem',
+                    minHeight: '40px',
                     borderRadius: 'var(--radius-sm)',
                     border: '1px solid var(--color-border-light)',
                     backgroundColor: 'transparent',
                     color: 'var(--color-text-main)',
                     fontSize: '0.875rem',
+                    cursor: 'pointer',
                   }}
                 >
                   Cancel
@@ -418,12 +427,14 @@ export const AdminProductsPage: React.FC = () => {
                   disabled={isUpdating}
                   style={{
                     padding: '0.5rem 1rem',
+                    minHeight: '40px',
                     borderRadius: 'var(--radius-sm)',
                     border: 'none',
                     backgroundColor: 'var(--color-orange-primary)',
                     color: '#FFFFFF',
                     fontWeight: 700,
                     fontSize: '0.875rem',
+                    cursor: 'pointer',
                   }}
                 >
                   Submit Inspection Report
