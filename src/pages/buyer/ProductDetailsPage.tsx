@@ -5,7 +5,7 @@ import { fetchProductInspection, fetchProductVerificationSummary } from '@/lib/a
 import { fetchSellerProfileById } from '@/lib/api/seller';
 import { createOrder } from '@/lib/api/orders';
 import { Product, InspectionReport, ProductVerificationSummary, SellerProfile } from '@/lib/api/types';
-import { getProductImagesList } from '@/lib/utils/productImages';
+import { getProductGalleryImages, TROIT_FALLBACK_IMAGE } from '@/lib/utils/productImages';
 import { useAuth } from '@/context/AuthContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -47,8 +47,8 @@ export const ProductDetailsPage: React.FC = () => {
     fetchProductById(id)
       .then(async (data) => {
         setProduct(data);
-        const images = getProductImagesList(data.name);
-        setSelectedImg(images[0] || '');
+        const gallery = getProductGalleryImages(data);
+        setSelectedImg(gallery[0] || TROIT_FALLBACK_IMAGE);
 
         // Fetch product verification summary
         try {
@@ -110,7 +110,17 @@ export const ProductDetailsPage: React.FC = () => {
     }
   };
 
-  const imagesList = product ? getProductImagesList(product.name) : [];
+  const imagesList = React.useMemo(() => {
+    return getProductGalleryImages(product);
+  }, [product]);
+
+  useEffect(() => {
+    if (imagesList.length > 0 && imagesList[0]) {
+      setSelectedImg(imagesList[0]);
+    } else {
+      setSelectedImg(TROIT_FALLBACK_IMAGE);
+    }
+  }, [imagesList]);
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -136,7 +146,7 @@ export const ProductDetailsPage: React.FC = () => {
           <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--color-text-muted)' }}>
             Loading verified product details...
           </div>
-        ) : error || !product ? (
+        ) : error || !product || product.is_archived ? (
           <div
             style={{
               backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -147,7 +157,7 @@ export const ProductDetailsPage: React.FC = () => {
               textAlign: 'center',
             }}
           >
-            {error || 'Product not found'}
+            {error || 'This product is unavailable or has been archived.'}
           </div>
         ) : (
           <div
@@ -175,41 +185,85 @@ export const ProductDetailsPage: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  position: 'relative',
                 }}
               >
                 <img
-                  src={selectedImg || imagesList[0]}
+                  src={selectedImg || (imagesList.length > 0 ? imagesList[0] : TROIT_FALLBACK_IMAGE)}
                   alt={product.name}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = TROIT_FALLBACK_IMAGE;
+                  }}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
+
+                {imagesList.length > 0 ? (
+                  <span
+                    style={{
+                      position: 'absolute',
+                      bottom: '12px',
+                      right: '12px',
+                      backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                      color: '#FFFFFF',
+                      padding: '4px 10px',
+                      borderRadius: 'var(--radius-pill)',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                    }}
+                  >
+                    Photo {Math.max(1, imagesList.indexOf(selectedImg) + 1)} of {imagesList.length}
+                  </span>
+                ) : (
+                  <span
+                    style={{
+                      position: 'absolute',
+                      bottom: '12px',
+                      right: '12px',
+                      backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                      color: 'var(--color-text-muted)',
+                      padding: '4px 10px',
+                      borderRadius: 'var(--radius-pill)',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    No photo attached
+                  </span>
+                )}
               </div>
 
               {/* Thumbnails */}
-              <div style={{ display: 'flex', gap: '12px' }}>
-                {imagesList.map((imgUrl, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImg(imgUrl)}
-                    style={{
-                      width: '72px',
-                      height: '72px',
-                      borderRadius: '8px',
-                      border:
-                        selectedImg === imgUrl
-                          ? '2px solid var(--color-orange-primary)'
-                          : '1px solid var(--color-border-light)',
-                      overflow: 'hidden',
-                      padding: 0,
-                    }}
-                  >
-                    <img
-                      src={imgUrl}
-                      alt={`Thumbnail ${idx}`}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  </button>
-                ))}
-              </div>
+              {imagesList.length > 1 && (
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                  {imagesList.map((imgUrl, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedImg(imgUrl)}
+                      style={{
+                        width: '72px',
+                        height: '72px',
+                        borderRadius: '8px',
+                        border:
+                          selectedImg === imgUrl
+                            ? '2px solid var(--color-orange-primary)'
+                            : '1px solid var(--color-border-light)',
+                        overflow: 'hidden',
+                        padding: 0,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <img
+                        src={imgUrl}
+                        alt={`Thumbnail ${idx + 1}`}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = TROIT_FALLBACK_IMAGE;
+                        }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Right: Product Overview, Trust Badges, & Action */}

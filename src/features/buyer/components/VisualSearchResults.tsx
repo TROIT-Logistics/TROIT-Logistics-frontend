@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, ArrowRight, Sparkles, RefreshCw, SearchX, CheckCircle } from 'lucide-react';
 import { VisualSearchResponse } from '@/lib/api/types';
-import { getProductImage } from '@/lib/utils/productImages';
+import { TROIT_FALLBACK_IMAGE } from '@/lib/utils/productImages';
 
 interface VisualSearchResultsProps {
   response: VisualSearchResponse;
@@ -152,7 +152,7 @@ export const VisualSearchResults: React.FC<VisualSearchResultsProps> = ({
           }}
         >
           {validMatches.map((product) => {
-            const prodImg = product.image_url || getProductImage(product.name);
+            const prodImg = product.image_url || TROIT_FALLBACK_IMAGE;
             const matchScore = product.match_score ? Math.round(product.match_score * 100) : null;
 
             return (
@@ -182,6 +182,9 @@ export const VisualSearchResults: React.FC<VisualSearchResultsProps> = ({
                   <img
                     src={prodImg}
                     alt={product.name}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = TROIT_FALLBACK_IMAGE;
+                    }}
                     style={{
                       width: '100%',
                       height: '100%',

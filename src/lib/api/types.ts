@@ -13,6 +13,17 @@ export type ProductVerificationStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
 export type ProductAuthenticityStatus = 'UNINSPECTED' | 'VERIFIED' | 'REJECTED' | string;
 export type AfricanMadeCategory = 'ELECTRONICS' | 'HOME_APPLIANCES' | 'FURNITURE' | string;
 
+export interface ProductImage {
+  id: string;
+  product_id: string;
+  url: string;
+  storage_key?: string;
+  mime_type: string;
+  file_size: number;
+  sort_order: number;
+  created_at: string;
+}
+
 export interface Product {
   id: string;
   seller_id: string;
@@ -29,8 +40,34 @@ export interface Product {
   african_made_category?: AfricanMadeCategory | null;
   warranty_months: number;
   warranty_terms?: string | null;
+  images: ProductImage[];
+  is_archived: boolean;
+  archived_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface UpdateProductPayload {
+  name?: string;
+  description?: string;
+  price?: number;
+  condition?: string;
+  is_african_made?: boolean;
+  african_made_category?: AfricanMadeCategory | null;
+  warranty_months?: number;
+  warranty_terms?: string | null;
+}
+
+export interface UpdateStockPayload {
+  stock: number;
+}
+
+export interface ArchiveProductPayload {
+  archived: boolean;
+}
+
+export interface ReorderImagesPayload {
+  image_ids: string[];
 }
 
 export type OrderStatus =

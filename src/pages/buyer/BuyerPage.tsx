@@ -6,7 +6,7 @@ import { fetchWishlist, removeFromWishlist } from '@/lib/api/wishlist';
 import { fetchNotifications, markNotificationRead, markAllNotificationsRead } from '@/lib/api/notifications';
 import { seedDemoData } from '@/lib/api/seed';
 import { Product, Order, Wishlist, Notification } from '@/lib/api/types';
-import { getProductImage } from '@/lib/utils/productImages';
+import { getPrimaryProductImage, TROIT_FALLBACK_IMAGE } from '@/lib/utils/productImages';
 import { useAuth } from '@/context/AuthContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -115,11 +115,13 @@ export const BuyerPage: React.FC = () => {
   const completedOrdersCount = orders.filter((o) => o.status === 'COMPLETED').length;
   const unreadNotifsCount = notifications.filter((n) => !n.is_read).length;
 
-  const filteredProducts = products.filter(
-    (p) =>
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredProducts = products
+    .filter((p) => !p.is_archived)
+    .filter(
+      (p) =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -292,15 +294,14 @@ export const BuyerPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Dashboard Tabs Navigation */}
+        {/* Dashboard Tabs */}
         <div
           style={{
             display: 'flex',
-            gap: '10px',
+            gap: '12px',
             borderBottom: '1px solid var(--color-border-light)',
-            marginBottom: '24px',
+            marginBottom: '32px',
             overflowX: 'auto',
-            paddingBottom: '2px',
           }}
         >
           <button
@@ -315,6 +316,9 @@ export const BuyerPage: React.FC = () => {
               borderBottom: activeTab === 'marketplace' ? '3px solid var(--color-orange-primary)' : '3px solid transparent',
               color: activeTab === 'marketplace' ? 'var(--color-orange-primary)' : 'var(--color-text-muted)',
               cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
             }}
           >
             Verified Marketplace
@@ -409,7 +413,7 @@ export const BuyerPage: React.FC = () => {
               border: '1px solid #EF4444',
               color: '#EF4444',
               borderRadius: '8px',
-              padding: '14px 18px',
+              padding: '12px 16px',
               marginBottom: '24px',
             }}
           >
@@ -417,36 +421,31 @@ export const BuyerPage: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 1: VERIFIED MARKETPLACE */}
+        {/* Tab 1: Verified Marketplace */}
         {activeTab === 'marketplace' && (
           <div>
-            {/* Search Controls */}
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '16px',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: '24px',
-                backgroundColor: 'var(--color-surface-card)',
-                padding: '16px 20px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border-light)',
-              }}
-            >
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', flex: '1 1 400px', maxWidth: '680px', alignItems: 'center' }}>
-                <div style={{ position: 'relative', flex: '1 1 240px' }}>
-                  <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-light)' }} />
+            <div style={{ marginBottom: '24px' }}>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, position: 'relative', minWidth: '280px' }}>
+                  <Search
+                    size={18}
+                    style={{
+                      position: 'absolute',
+                      left: '14px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: 'var(--color-text-muted)',
+                    }}
+                  />
                   <input
                     type="text"
-                    placeholder="Search verified smartphones, laptops, electronics..."
+                    placeholder="Search verified tech & African electronics..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     style={{
                       width: '100%',
-                      padding: '10px 12px 10px 38px',
-                      borderRadius: 'var(--radius-pill)',
+                      padding: '12px 14px 12px 42px',
+                      borderRadius: 'var(--radius-md)',
                       border: '1px solid var(--color-border-light)',
                       backgroundColor: 'var(--color-bg-page)',
                       color: 'var(--color-text-main)',
@@ -491,7 +490,7 @@ export const BuyerPage: React.FC = () => {
                 }}
               >
                 {filteredProducts.map((product) => {
-                  const prodImg = getProductImage(product.name);
+                  const primaryImage = getPrimaryProductImage(product);
 
                   return (
                     <div
@@ -517,8 +516,11 @@ export const BuyerPage: React.FC = () => {
                         }}
                       >
                         <img
-                          src={prodImg}
+                          src={primaryImage}
                           alt={product.name}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = TROIT_FALLBACK_IMAGE;
+                          }}
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
 

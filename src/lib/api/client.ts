@@ -43,6 +43,14 @@ apiClient.interceptors.response.use(
       friendlyMessage = error.response.data.message;
     } else if (error.response?.status === 401) {
       friendlyMessage = 'Authentication session expired or invalid. Please sign in again.';
+    } else if (error.response?.status === 403) {
+      friendlyMessage = 'You are not authorized to perform this operation.';
+    } else if (error.response?.status === 404) {
+      friendlyMessage = 'The requested product or resource was not found.';
+    } else if (error.response?.status === 422) {
+      friendlyMessage = 'Validation failed. Please check your inputs and try again.';
+    } else if (error.response?.status && error.response.status >= 500) {
+      friendlyMessage = 'The server encountered an error. Please try again in a few moments.';
     } else if (error.message === 'Network Error') {
       friendlyMessage = 'Unable to connect to the TROIT backend server. Please verify network connectivity or backend service status.';
     }

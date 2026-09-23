@@ -26,7 +26,9 @@ export const LoginPage: React.FC = () => {
       const res = await loginUser({ email: cleanEmail, password });
       if (res.token && res.user) {
         login(res.token, res.user);
-        if (res.user.role === 'seller') {
+        if (res.user.role === 'admin') {
+          navigate('/admin/overview');
+        } else if (res.user.role === 'seller') {
           navigate('/seller');
         } else {
           navigate('/buyer');

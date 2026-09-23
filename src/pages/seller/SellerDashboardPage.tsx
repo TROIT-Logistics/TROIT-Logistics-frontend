@@ -8,11 +8,16 @@ import {
   fetchSellerSubscription,
   fetchTrustHistory,
 } from '@/lib/api/seller';
+import { restoreProduct } from '@/lib/api/products';
 import { Product, Order, SellerProfile, SellerVerificationStatusResponse, Subscription, TrustHistory } from '@/lib/api/types';
-import { getProductImage } from '@/lib/utils/productImages';
+import { getPrimaryProductImage, TROIT_FALLBACK_IMAGE } from '@/lib/utils/productImages';
 import { useAuth } from '@/context/AuthContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import SellerProductEditModal from '@/components/seller/SellerProductEditModal';
+import SellerStockUpdateModal from '@/components/seller/SellerStockUpdateModal';
+import SellerProductImagesModal from '@/components/seller/SellerProductImagesModal';
+import ArchiveConfirmationModal from '@/components/seller/ArchiveConfirmationModal';
 import {
   Plus,
   ShieldCheck,
@@ -28,6 +33,9 @@ import {
   Edit3,
   RefreshCw,
   PackageX,
+  ImageIcon,
+  Archive,
+  RotateCcw,
 } from 'lucide-react';
 
 export const SellerDashboardPage: React.FC = () => {
@@ -38,7 +46,14 @@ export const SellerDashboardPage: React.FC = () => {
   const [verificationState, setVerificationState] = useState<SellerVerificationStatusResponse | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [trustHistory, setTrustHistory] = useState<TrustHistory[]>([]);
-  const [activeTab, setActiveTab] = useState<'ALL' | 'VERIFIED' | 'PENDING' | 'REJECTED'>('ALL');
+  const [activeTab, setActiveTab] = useState<'ALL' | 'VERIFIED' | 'PENDING' | 'REJECTED' | 'ARCHIVED'>('ALL');
+
+  // Modals state
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [stockProduct, setStockProduct] = useState<Product | null>(null);
+  const [imagesProduct, setImagesProduct] = useState<Product | null>(null);
+  const [archivingProduct, setArchivingProduct] = useState<Product | null>(null);
+  const [isRestoringId, setIsRestoringId] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,7 +94,12 @@ export const SellerDashboardPage: React.FC = () => {
     (p) => p.seller_id === user?.id || (user?.email === 'seller@demo.troit' && p.seller_id === 'c8f58e47-9f9e-4451-a59b-ebd107d28339')
   );
 
+  const activeProducts = sellerProducts.filter((p) => !p.is_archived);
+  const archivedProducts = sellerProducts.filter((p) => p.is_archived);
+
   const displayedProducts = sellerProducts.filter((p) => {
+    if (activeTab === 'ARCHIVED') return p.is_archived;
+    if (p.is_archived) return false;
     if (activeTab === 'ALL') return true;
     return p.verification_status === activeTab;
   });
@@ -90,9 +110,27 @@ export const SellerDashboardPage: React.FC = () => {
   const releasedEarnings = completedOrders.reduce((sum, o) => sum + o.amount, 0);
 
   // Inspection inventory breakdown
-  const verifiedInventoryCount = sellerProducts.filter((p) => p.verification_status === 'VERIFIED').length;
-  const awaitingInspectionCount = sellerProducts.filter((p) => p.verification_status === 'PENDING').length;
-  const rejectedInventoryCount = sellerProducts.filter((p) => p.verification_status === 'REJECTED').length;
+  const verifiedInventoryCount = activeProducts.filter((p) => p.verification_status === 'VERIFIED').length;
+  const awaitingInspectionCount = activeProducts.filter((p) => p.verification_status === 'PENDING').length;
+  const rejectedInventoryCount = activeProducts.filter((p) => p.verification_status === 'REJECTED').length;
+  const archivedInventoryCount = archivedProducts.length;
+
+  const handleProductUpdated = (updated: Product) => {
+    setProducts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+  };
+
+  const handleRestore = async (id: string) => {
+    setError(null);
+    setIsRestoringId(id);
+    try {
+      const restored = await restoreProduct(id);
+      handleProductUpdated(restored);
+    } catch (err) {
+      setError((err as Error).message || 'Failed to restore product');
+    } finally {
+      setIsRestoringId(null);
+    }
+  };
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -433,7 +471,7 @@ export const SellerDashboardPage: React.FC = () => {
                     className={activeTab === 'ALL' ? 'btn btn-orange' : 'btn btn-dark'}
                     style={{ fontSize: '0.75rem', padding: '6px 12px' }}
                   >
-                    All ({sellerProducts.length})
+                    All ({activeProducts.length})
                   </button>
                   <button
                     type="button"
@@ -459,6 +497,16 @@ export const SellerDashboardPage: React.FC = () => {
                       style={{ fontSize: '0.75rem', padding: '6px 12px' }}
                     >
                       Rejected ({rejectedInventoryCount})
+                    </button>
+                  )}
+                  {(archivedInventoryCount > 0 || activeTab === 'ARCHIVED') && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('ARCHIVED')}
+                      className={activeTab === 'ARCHIVED' ? 'btn btn-orange' : 'btn btn-dark'}
+                      style={{ fontSize: '0.75rem', padding: '6px 12px' }}
+                    >
+                      Archived ({archivedInventoryCount})
                     </button>
                   )}
                 </div>
@@ -487,9 +535,9 @@ export const SellerDashboardPage: React.FC = () => {
                   </Link>
                 </div>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
                   {displayedProducts.map((prod) => {
-                    const prodImg = getProductImage(prod.name);
+                    const primaryImage = getPrimaryProductImage(prod);
 
                     return (
                       <div
@@ -502,10 +550,19 @@ export const SellerDashboardPage: React.FC = () => {
                           display: 'flex',
                           flexDirection: 'column',
                           justifyContent: 'space-between',
+                          opacity: prod.is_archived ? 0.75 : 1,
                         }}
                       >
                         <div style={{ height: '160px', overflow: 'hidden', position: 'relative' }}>
-                          <img src={prodImg} alt={prod.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <img
+                            src={primaryImage}
+                            alt={prod.name}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = TROIT_FALLBACK_IMAGE;
+                            }}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
+
                           <span
                             style={{
                               position: 'absolute',
@@ -515,16 +572,17 @@ export const SellerDashboardPage: React.FC = () => {
                               fontWeight: 800,
                               padding: '4px 10px',
                               borderRadius: 'var(--radius-pill)',
-                              backgroundColor:
-                                prod.verification_status === 'VERIFIED'
-                                  ? 'rgba(16, 185, 129, 0.95)'
-                                  : prod.verification_status === 'REJECTED'
-                                  ? 'rgba(239, 68, 68, 0.95)'
-                                  : 'rgba(245, 158, 11, 0.95)',
+                              backgroundColor: prod.is_archived
+                                ? 'rgba(107, 114, 128, 0.95)'
+                                : prod.verification_status === 'VERIFIED'
+                                ? 'rgba(16, 185, 129, 0.95)'
+                                : prod.verification_status === 'REJECTED'
+                                ? 'rgba(239, 68, 68, 0.95)'
+                                : 'rgba(245, 158, 11, 0.95)',
                               color: '#FFFFFF',
                             }}
                           >
-                            {prod.verification_status}
+                            {prod.is_archived ? 'ARCHIVED' : prod.verification_status}
                           </span>
 
                           {prod.is_african_made && (
@@ -567,30 +625,69 @@ export const SellerDashboardPage: React.FC = () => {
                             <Link
                               to={`/buyer/products/${prod.id}`}
                               className="btn btn-dark"
-                              style={{ fontSize: '0.75rem', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                              style={{ fontSize: '0.75rem', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                             >
                               <Eye size={13} /> View
                             </Link>
 
                             <button
                               type="button"
+                              onClick={() => setEditingProduct(prod)}
                               className="btn btn-dark"
-                              title="Product edit endpoint (PUT /api/v1/products/:id) is pending backend support"
-                              disabled
-                              style={{ opacity: 0.5, cursor: 'not-allowed', fontSize: '0.75rem', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                              style={{ fontSize: '0.75rem', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                             >
                               <Edit3 size={13} /> Edit
                             </button>
 
                             <button
                               type="button"
+                              onClick={() => setImagesProduct(prod)}
                               className="btn btn-dark"
-                              title="Stock update endpoint (PATCH /api/v1/products/:id/stock) is pending backend support"
-                              disabled
-                              style={{ opacity: 0.5, cursor: 'not-allowed', fontSize: '0.75rem', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                              style={{ fontSize: '0.75rem', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                            >
+                              <ImageIcon size={13} /> Images ({prod.images?.length || 0})
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setStockProduct(prod)}
+                              className="btn btn-dark"
+                              style={{ fontSize: '0.75rem', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                             >
                               <RefreshCw size={13} /> Stock
                             </button>
+
+                            {prod.is_archived ? (
+                              <button
+                                type="button"
+                                onClick={() => handleRestore(prod.id)}
+                                disabled={isRestoringId === prod.id}
+                                className="btn btn-orange"
+                                style={{ fontSize: '0.75rem', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                              >
+                                <RotateCcw size={13} /> {isRestoringId === prod.id ? 'Restoring...' : 'Restore'}
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => setArchivingProduct(prod)}
+                                style={{
+                                  backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                                  color: '#F59E0B',
+                                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                                  borderRadius: '6px',
+                                  padding: '6px 10px',
+                                  fontSize: '0.75rem',
+                                  cursor: 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  fontWeight: 700,
+                                }}
+                              >
+                                <Archive size={13} /> Archive
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -654,6 +751,39 @@ export const SellerDashboardPage: React.FC = () => {
               )}
             </div>
           </div>
+        )}
+
+        {/* Modal Dialogs */}
+        {editingProduct && (
+          <SellerProductEditModal
+            product={editingProduct}
+            onClose={() => setEditingProduct(null)}
+            onSuccess={handleProductUpdated}
+          />
+        )}
+
+        {stockProduct && (
+          <SellerStockUpdateModal
+            product={stockProduct}
+            onClose={() => setStockProduct(null)}
+            onSuccess={handleProductUpdated}
+          />
+        )}
+
+        {imagesProduct && (
+          <SellerProductImagesModal
+            product={imagesProduct}
+            onClose={() => setImagesProduct(null)}
+            onSuccess={handleProductUpdated}
+          />
+        )}
+
+        {archivingProduct && (
+          <ArchiveConfirmationModal
+            product={archivingProduct}
+            onClose={() => setArchivingProduct(null)}
+            onSuccess={handleProductUpdated}
+          />
         )}
       </main>
 

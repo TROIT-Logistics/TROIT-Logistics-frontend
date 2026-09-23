@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { createProduct } from '@/lib/api/products';
-import { useSellerVerification } from '@/context/SellerVerificationContext';
+import { ArrowLeft, PlusCircle, ShieldAlert } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useSellerVerification } from '@/context/SellerVerificationContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { ArrowLeft, PlusCircle, ShieldAlert, UploadCloud, X, Sparkles } from 'lucide-react';
-import iphoneImg from '@/assets/images/product_iphone14pro.png';
-import samsungImg from '@/assets/images/product_samsung23ultra.png';
-import hpSpectreImg from '@/assets/images/product_hpspectre.png';
+import ProductImageUploader, { SelectedFileItem } from '@/components/seller/ProductImageUploader';
+import { createProduct, uploadProductImage } from '@/lib/api/products';
 
 export const SellerCreateProductPage: React.FC = () => {
   const navigate = useNavigate();
@@ -20,8 +18,7 @@ export const SellerCreateProductPage: React.FC = () => {
   const [price, setPrice] = useState('');
   const [condition, setCondition] = useState('Grade A - Like New');
   const [stock, setStock] = useState('1');
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [customUrlInput, setCustomUrlInput] = useState('');
+  const [selectedImageFiles, setSelectedImageFiles] = useState<SelectedFileItem[]>([]);
 
   const [isAfricanMade, setIsAfricanMade] = useState(false);
   const [africanMadeCategory, setAfricanMadeCategory] = useState('ELECTRONICS');
@@ -29,35 +26,12 @@ export const SellerCreateProductPage: React.FC = () => {
   const [warrantyTerms, setWarrantyTerms] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
+  const [uploadProgressText, setUploadProgressText] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Unverified seller protection check
   const isUnverified = user?.role === 'seller' && status !== 'VERIFIED' && user.email !== 'seller@demo.troit';
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const newFiles = Array.from(e.target.files);
-      const newUrls = newFiles.map((file) => URL.createObjectURL(file));
-      setImageUrls((prev) => [...prev, ...newUrls]);
-    }
-  };
-
-  const handleAddCustomUrl = () => {
-    if (customUrlInput.trim()) {
-      setImageUrls((prev) => [...prev, customUrlInput.trim()]);
-      setCustomUrlInput('');
-    }
-  };
-
-  const handleRemoveImage = (index: number) => {
-    setImageUrls((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleAddPresetImage = (url: string) => {
-    if (!imageUrls.includes(url)) {
-      setImageUrls((prev) => [...prev, url]);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +67,8 @@ export const SellerCreateProductPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await createProduct({
+      // 1. Create product record first via POST /api/v1/products
+      const createdProduct = await createProduct({
         name: name.trim(),
         description: description.trim(),
         price: priceNum,
@@ -105,11 +80,24 @@ export const SellerCreateProductPage: React.FC = () => {
         warranty_terms: warrantyTerms.trim() || undefined,
       });
 
+      // 2. Upload each selected product image sequentially via POST /api/v1/products/:id/images
+      if (selectedImageFiles.length > 0) {
+        setIsUploadingImages(true);
+        let index = 1;
+        for (const item of selectedImageFiles) {
+          setUploadProgressText(`Uploading photo ${index} of ${selectedImageFiles.length} to backend storage...`);
+          await uploadProductImage(createdProduct.id, item.file);
+          index++;
+        }
+      }
+
       navigate('/seller');
     } catch (err) {
       setError((err as Error).message || 'Failed to create product');
     } finally {
       setIsLoading(false);
+      setIsUploadingImages(false);
+      setUploadProgressText(null);
     }
   };
 
@@ -225,148 +213,16 @@ export const SellerCreateProductPage: React.FC = () => {
 
               <form onSubmit={handleSubmit}>
                 {/* Product Photos Upload Box */}
-                <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px' }}>
-                    Product Photos & Inspection Images
-                  </label>
-
-                  {/* Dropzone Upload Area */}
-                  <div
-                    style={{
-                      border: '2px dashed var(--color-orange-primary)',
-                      borderRadius: 'var(--radius-md)',
-                      backgroundColor: 'rgba(255, 77, 0, 0.04)',
-                      padding: '24px 16px',
-                      textAlign: 'center',
-                      cursor: 'pointer',
-                      position: 'relative',
-                      marginBottom: '12px',
-                    }}
-                  >
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        opacity: 0,
-                        cursor: 'pointer',
-                        width: '100%',
-                        height: '100%',
-                      }}
-                    />
-                    <UploadCloud size={32} style={{ color: 'var(--color-orange-primary)', margin: '0 auto 8px' }} />
-                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-main)' }}>
-                      Click or Drag Product Photos Here
-                    </div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                      PNG, JPG, WEBP up to 10MB per photo
-                    </div>
-                  </div>
-
-                  {/* Quick Preset Photos Selection */}
-                  <div style={{ marginBottom: '12px' }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '6px' }}>
-                      <Sparkles size={12} style={{ display: 'inline', marginRight: '4px' }} /> Quick sample photos for demo:
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                      <button
-                        type="button"
-                        onClick={() => handleAddPresetImage(iphoneImg)}
-                        className="btn btn-dark"
-                        style={{ fontSize: '0.75rem', padding: '6px 12px' }}
-                      >
-                        + iPhone 14 Pro
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleAddPresetImage(samsungImg)}
-                        className="btn btn-dark"
-                        style={{ fontSize: '0.75rem', padding: '6px 12px' }}
-                      >
-                        + Galaxy S23
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleAddPresetImage(hpSpectreImg)}
-                        className="btn btn-dark"
-                        style={{ fontSize: '0.75rem', padding: '6px 12px' }}
-                      >
-                        + HP Laptop
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Optional Image URL Input */}
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                    <input
-                      type="url"
-                      placeholder="Or paste photo URL link..."
-                      value={customUrlInput}
-                      onChange={(e) => setCustomUrlInput(e.target.value)}
-                      style={{
-                        flex: 1,
-                        padding: '8px 12px',
-                        borderRadius: '8px',
-                        border: '1px solid var(--color-border-light)',
-                        backgroundColor: 'var(--color-bg-page)',
-                        color: 'var(--color-text-main)',
-                        fontSize: '0.85rem',
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddCustomUrl}
-                      className="btn btn-dark"
-                      style={{ padding: '8px 14px', fontSize: '0.8rem' }}
-                    >
-                      Add Photo
-                    </button>
-                  </div>
-
-                  {/* Thumbnail Gallery Preview */}
-                  {imageUrls.length > 0 && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '10px', marginTop: '12px' }}>
-                      {imageUrls.map((url, idx) => (
-                        <div
-                          key={idx}
-                          style={{
-                            position: 'relative',
-                            width: '100%',
-                            height: '80px',
-                            borderRadius: '8px',
-                            overflow: 'hidden',
-                            border: '1px solid var(--color-border-light)',
-                            backgroundColor: '#000000',
-                          }}
-                        >
-                          <img src={url} alt={`Upload ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveImage(idx)}
-                            style={{
-                              position: 'absolute',
-                              top: '4px',
-                              right: '4px',
-                              backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                              color: '#FFFFFF',
-                              borderRadius: '50%',
-                              width: '20px',
-                              height: '20px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              padding: 0,
-                            }}
-                          >
-                            <X size={12} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                <div style={{ marginBottom: '24px' }}>
+                  <ProductImageUploader
+                    selectedFiles={selectedImageFiles}
+                    onChange={setSelectedImageFiles}
+                    maxFiles={5}
+                    maxSizeMb={5}
+                    isUploading={isUploadingImages}
+                    uploadProgressText={uploadProgressText}
+                    disabled={isLoading}
+                  />
                 </div>
 
                 <div style={{ marginBottom: '16px' }}>
