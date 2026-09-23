@@ -43,6 +43,22 @@ export const SellerVerificationStatusPage: React.FC = () => {
               >
                 <CheckCircle2 size={36} />
               </div>
+            ) : status === 'REJECTED' ? (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                  color: '#EF4444',
+                  marginBottom: '20px',
+                }}
+              >
+                <AlertCircle size={36} />
+              </div>
             ) : (
               <div
                 style={{
@@ -62,7 +78,11 @@ export const SellerVerificationStatusPage: React.FC = () => {
             )}
 
             <h1 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '8px' }}>
-              {status === 'VERIFIED' ? 'Seller Account Verified!' : 'Verification Submitted'}
+              {status === 'VERIFIED'
+                ? 'Seller Account Verified!'
+                : status === 'REJECTED'
+                ? 'Verification Application Rejected'
+                : 'Verification Submitted'}
             </h1>
 
             {/* Status Badge */}
@@ -73,21 +93,37 @@ export const SellerVerificationStatusPage: React.FC = () => {
                   fontWeight: 800,
                   padding: '6px 16px',
                   borderRadius: 'var(--radius-pill)',
-                  backgroundColor: status === 'VERIFIED' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 184, 66, 0.15)',
-                  color: status === 'VERIFIED' ? '#10B981' : '#D97706',
-                  border: `1px solid ${status === 'VERIFIED' ? '#10B981' : '#F5B842'}`,
+                  backgroundColor:
+                    status === 'VERIFIED'
+                      ? 'rgba(16, 185, 129, 0.15)'
+                      : status === 'REJECTED'
+                      ? 'rgba(239, 68, 68, 0.15)'
+                      : 'rgba(245, 184, 66, 0.15)',
+                  color: status === 'VERIFIED' ? '#10B981' : status === 'REJECTED' ? '#EF4444' : '#D97706',
+                  border: `1px solid ${
+                    status === 'VERIFIED' ? '#10B981' : status === 'REJECTED' ? '#EF4444' : '#F5B842'
+                  }`,
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
                 }}
               >
-                {status === 'VERIFIED' ? <ShieldCheck size={16} /> : <Clock size={16} />} VERIFICATION STATUS: {status.replace('_', ' ')}
+                {status === 'VERIFIED' ? (
+                  <ShieldCheck size={16} />
+                ) : status === 'REJECTED' ? (
+                  <AlertCircle size={16} />
+                ) : (
+                  <Clock size={16} />
+                )}{' '}
+                VERIFICATION STATUS: {status.replace('_', ' ')}
               </span>
             </div>
 
             <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '28px' }}>
               {status === 'VERIFIED'
                 ? 'Your seller account has been approved by TROIT. You now have full access to list verified inventory.'
+                : status === 'REJECTED'
+                ? 'Your seller verification application was rejected. You can update your details and re-submit your application for admin review.'
                 : 'Your seller verification information has been submitted and is being reviewed. You will be able to start listing products once your account is approved.'}
             </p>
 
@@ -126,6 +162,25 @@ export const SellerVerificationStatusPage: React.FC = () => {
               <button onClick={() => navigate('/seller')} className="btn btn-orange" style={{ width: '100%', justifyContent: 'center' }}>
                 Go to Seller Dashboard <ArrowRight size={18} />
               </button>
+            ) : status === 'REJECTED' ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div
+                  style={{
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid #EF4444',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '16px',
+                    fontSize: '0.85rem',
+                    color: 'var(--color-text-main)',
+                  }}
+                >
+                  <AlertCircle size={20} style={{ color: '#EF4444', margin: '0 auto 8px', display: 'block' }} />
+                  Product listing is restricted. Please re-submit your verification application.
+                </div>
+                <button onClick={() => navigate('/seller/verification')} className="btn btn-orange" style={{ width: '100%', justifyContent: 'center' }}>
+                  Re-submit Verification Application <ArrowRight size={18} />
+                </button>
+              </div>
             ) : (
               <div
                 style={{

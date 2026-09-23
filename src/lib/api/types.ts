@@ -289,6 +289,8 @@ export interface AdminSellerItem {
   updated_at: string;
 }
 
+export type AdminSellerItemResponse = AdminSellerItem;
+
 export interface AdminSellerListResponse {
   items: AdminSellerItem[];
   total: number;

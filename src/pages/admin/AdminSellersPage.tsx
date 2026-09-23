@@ -2,9 +2,26 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { AdminDataTable, Column } from '@/components/admin/AdminDataTable';
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge';
-import { fetchAdminSellers, fetchSellerTrustHistoryByIdAdmin } from '@/lib/api/admin';
+import {
+  fetchAdminSellers,
+  fetchSellerTrustHistoryByIdAdmin,
+  updateSellerVerificationAdmin,
+} from '@/lib/api/admin';
 import { AdminSellerItem, TrustHistory } from '@/lib/api/types';
-import { Store, ShieldCheck, X, Phone, Mail, Package, ShoppingBag } from 'lucide-react';
+import {
+  Store,
+  ShieldCheck,
+  X,
+  Phone,
+  Mail,
+  Package,
+  ShoppingBag,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Loader2,
+  Eye,
+} from 'lucide-react';
 
 export const AdminSellersPage: React.FC = () => {
   const [sellers, setSellers] = useState<AdminSellerItem[]>([]);
@@ -20,6 +37,15 @@ export const AdminSellersPage: React.FC = () => {
   const [selectedSeller, setSelectedSeller] = useState<AdminSellerItem | null>(null);
   const [trustHistory, setTrustHistory] = useState<TrustHistory[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
+
+  // Verification Action & Confirmation Modal State
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{
+    type: 'VERIFIED' | 'REJECTED' | 'UNDER_REVIEW';
+    seller: AdminSellerItem;
+  } | null>(null);
 
   const loadSellers = useCallback(async () => {
     try {
@@ -50,6 +76,8 @@ export const AdminSellersPage: React.FC = () => {
   const handleRowClick = async (seller: AdminSellerItem) => {
     setSelectedSeller(seller);
     setTrustHistory([]);
+    setActionError(null);
+    setActionSuccess(null);
     try {
       setDetailLoading(true);
       const history = await fetchSellerTrustHistoryByIdAdmin(seller.seller_id);
@@ -58,6 +86,31 @@ export const AdminSellersPage: React.FC = () => {
       // Trust history fetch optional fallback
     } finally {
       setDetailLoading(false);
+    }
+  };
+
+  const handleExecuteVerificationUpdate = async () => {
+    if (!confirmModal) return;
+    const { type, seller } = confirmModal;
+
+    try {
+      setActionLoading(true);
+      setActionError(null);
+      setActionSuccess(null);
+
+      const updated = await updateSellerVerificationAdmin(seller.seller_id, type);
+
+      setActionSuccess(`Successfully updated seller verification status to ${type}.`);
+      if (selectedSeller && selectedSeller.seller_id === seller.seller_id) {
+        setSelectedSeller({ ...selectedSeller, verification_status: updated.verification_status });
+      }
+
+      setConfirmModal(null);
+      await loadSellers();
+    } catch (err: unknown) {
+      setActionError(err instanceof Error ? err.message : 'Failed to update seller verification status');
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -116,12 +169,71 @@ export const AdminSellersPage: React.FC = () => {
       ),
     },
     {
-      key: 'total_products',
-      header: 'Activity',
+      key: 'actions',
+      header: 'Actions',
       render: (item) => (
-        <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-          <div>{item.total_products} products</div>
-          <div>{item.total_orders} orders</div>
+        <div
+          style={{ display: 'flex', gap: '0.375rem', alignItems: 'center' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={() => handleRowClick(item)}
+            style={{
+              padding: '5px 10px',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--color-border-light)',
+              backgroundColor: 'var(--color-surface-card)',
+              color: 'var(--color-text-main)',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+          >
+            <Eye size={12} /> View
+          </button>
+          {item.verification_status !== 'VERIFIED' && (
+            <button
+              onClick={() => setConfirmModal({ type: 'VERIFIED', seller: item })}
+              style={{
+                padding: '5px 10px',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid #10B981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                color: '#10B981',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+              }}
+            >
+              <CheckCircle size={12} /> Approve
+            </button>
+          )}
+          {item.verification_status !== 'REJECTED' && (
+            <button
+              onClick={() => setConfirmModal({ type: 'REJECTED', seller: item })}
+              style={{
+                padding: '5px 10px',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid #EF4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                color: '#EF4444',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+              }}
+            >
+              <XCircle size={12} /> Reject
+            </button>
+          )}
         </div>
       ),
     },
@@ -150,8 +262,8 @@ export const AdminSellersPage: React.FC = () => {
         }}
       >
         <option value="ALL">All Statuses</option>
-        <option value="PENDING">PENDING</option>
         <option value="UNDER_REVIEW">UNDER_REVIEW</option>
+        <option value="PENDING">PENDING</option>
         <option value="VERIFIED">VERIFIED</option>
         <option value="REJECTED">REJECTED</option>
       </select>
@@ -161,8 +273,46 @@ export const AdminSellersPage: React.FC = () => {
   return (
     <AdminLayout
       title="Seller Directory & Verification"
-      subtitle="Inspect merchant store profiles, trust scores, and verification status"
+      subtitle="Inspect merchant store profiles, trust scores, and manage verification approvals"
     >
+      {actionSuccess && (
+        <div
+          style={{
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            border: '1px solid #10B981',
+            color: '#10B981',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            marginBottom: '20px',
+            fontSize: '0.875rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <CheckCircle size={18} /> {actionSuccess}
+        </div>
+      )}
+
+      {actionError && (
+        <div
+          style={{
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid #EF4444',
+            color: '#EF4444',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            marginBottom: '20px',
+            fontSize: '0.875rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <AlertCircle size={18} /> {actionError}
+        </div>
+      )}
+
       <AdminDataTable
         columns={columns}
         data={sellers}
@@ -273,9 +423,87 @@ export const AdminSellersPage: React.FC = () => {
               </button>
             </div>
 
+            {/* Verification Admin Action Control Box */}
+            <div
+              style={{
+                backgroundColor: 'var(--color-surface-card)',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: 'var(--radius-md)',
+                padding: '1.25rem',
+                marginBottom: '1.5rem',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '1rem',
+                }}
+              >
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                    Verification Decision Status
+                  </span>
+                  <div style={{ marginTop: '4px' }}>
+                    <AdminStatusBadge status={selectedSeller.verification_status} type="seller_verification" size="lg" />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {selectedSeller.verification_status !== 'VERIFIED' && (
+                    <button
+                      onClick={() => setConfirmModal({ type: 'VERIFIED', seller: selectedSeller })}
+                      disabled={actionLoading}
+                      style={{
+                        padding: '8px 16px',
+                        fontSize: '0.85rem',
+                        fontWeight: 800,
+                        borderRadius: 'var(--radius-sm)',
+                        border: 'none',
+                        backgroundColor: '#10B981',
+                        color: '#FFFFFF',
+                        cursor: actionLoading ? 'not-allowed' : 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                      }}
+                    >
+                      <CheckCircle size={16} /> Approve Verification
+                    </button>
+                  )}
+
+                  {selectedSeller.verification_status !== 'REJECTED' && (
+                    <button
+                      onClick={() => setConfirmModal({ type: 'REJECTED', seller: selectedSeller })}
+                      disabled={actionLoading}
+                      style={{
+                        padding: '8px 16px',
+                        fontSize: '0.85rem',
+                        fontWeight: 800,
+                        borderRadius: 'var(--radius-sm)',
+                        border: '1px solid #EF4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        color: '#EF4444',
+                        cursor: actionLoading ? 'not-allowed' : 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                      }}
+                    >
+                      <XCircle size={16} /> Reject Application
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+                Approving verification grants this seller permission to list verified products. Rejection restricts listing access while preserving store details.
+              </div>
+            </div>
+
             {/* Badges & Trust Summary */}
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-              <AdminStatusBadge status={selectedSeller.verification_status} type="seller_verification" size="lg" />
               <AdminStatusBadge status={selectedSeller.seller_grade} type="seller_grade" size="lg" />
               <AdminStatusBadge status={selectedSeller.trust_level} type="seller_verification" size="lg" />
             </div>
@@ -416,6 +644,81 @@ export const AdminSellersPage: React.FC = () => {
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {confirmModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1100,
+            padding: '1rem',
+          }}
+          onClick={() => setConfirmModal(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: 'var(--radius-md)',
+              width: '100%',
+              maxWidth: '440px',
+              padding: '1.5rem',
+              boxShadow: 'var(--shadow-lg)',
+            }}
+          >
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '8px' }}>
+              Confirm Verification {confirmModal.type === 'VERIFIED' ? 'Approval' : 'Rejection'}
+            </h3>
+
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', lineHeight: 1.5, marginBottom: '20px' }}>
+              Are you sure you want to mark verification status as{' '}
+              <strong style={{ color: confirmModal.type === 'VERIFIED' ? '#10B981' : '#EF4444' }}>
+                {confirmModal.type}
+              </strong>{' '}
+              for store <strong>"{confirmModal.seller.store_name || confirmModal.seller.user_full_name}"</strong>?
+            </p>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <button
+                onClick={() => setConfirmModal(null)}
+                disabled={actionLoading}
+                className="btn btn-dark"
+                style={{ fontSize: '0.85rem' }}
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleExecuteVerificationUpdate}
+                disabled={actionLoading}
+                style={{
+                  padding: '8px 16px',
+                  fontSize: '0.85rem',
+                  fontWeight: 800,
+                  borderRadius: 'var(--radius-sm)',
+                  border: 'none',
+                  backgroundColor: confirmModal.type === 'VERIFIED' ? '#10B981' : '#EF4444',
+                  color: '#FFFFFF',
+                  cursor: actionLoading ? 'not-allowed' : 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                {actionLoading && <Loader2 size={16} className="animate-spin" />}
+                {confirmModal.type === 'VERIFIED' ? 'Confirm Approval' : 'Confirm Rejection'}
+              </button>
             </div>
           </div>
         </div>

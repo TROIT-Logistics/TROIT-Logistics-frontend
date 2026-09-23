@@ -9,6 +9,7 @@ import {
   ProductVerificationSummary,
   SellerProfile,
   TrustHistory,
+  AdminSellerItemResponse,
   AdminSellerListResponse,
   AdminSellerQueryParams,
   AdminUserListResponse,
@@ -127,6 +128,17 @@ export const fetchAdminSellers = async (
 export const fetchSellerProfileByIdAdmin = async (sellerId: string): Promise<SellerProfile> => {
   const response = await apiClient.get<ApiResponse<SellerProfile>>(
     `/seller/profile/${sellerId}`
+  );
+  return response.data.data!;
+};
+
+export const updateSellerVerificationAdmin = async (
+  sellerId: string,
+  status: 'VERIFIED' | 'REJECTED' | 'UNDER_REVIEW' | 'PENDING'
+): Promise<AdminSellerItemResponse> => {
+  const response = await apiClient.patch<ApiResponse<AdminSellerItemResponse>>(
+    `/admin/sellers/${sellerId}/verification`,
+    { status }
   );
   return response.data.data!;
 };
